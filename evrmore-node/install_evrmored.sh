@@ -6,8 +6,11 @@ set -e
 EVRMORE_USER="evrmored"
 EVRMORE_GROUP="evrmored"
 EVRMORE_DIR="/opt/evrmored"
-EVRMORE_BINARY="/path/to/evrmored"  # Replace with the actual binary path
+EVRMORE_SOURCE_BINARY="/root/manticore-pool/evrmore-node/evrmored"  # Source binary path
+EVRMORE_BINARY="$EVRMORE_DIR/evrmored"  # Destination binary path
 SERVICE_FILE="/etc/systemd/system/evrmored.service"
+CONFIG_DIR="/etc/evrmored"
+CONFIG_FILE="$CONFIG_DIR/evrmore.conf"
 
 # Functions
 create_user_and_group() {
@@ -23,9 +26,41 @@ create_user_and_group() {
 setup_directories() {
   echo "Setting up directories..."
   mkdir -p $EVRMORE_DIR
-  chown -R $EVRMORE_USER:$EVRMORE_GROUP $EVRMORE_DIR
+  mkdir -p $CONFIG_DIR
+  chown -R $EVRMORE_USER:$EVRMORE_GROUP $EVRMORE_DIR $CONFIG_DIR
   chmod 750 $EVRMORE_DIR
-  echo "Directories set up at $EVRMORE_DIR."
+  echo "Directories set up at $EVRMORE_DIR and $CONFIG_DIR."
+}
+
+copy_binary() {
+  echo "Copying evrmored binary to $EVRMORE_DIR..."
+  if [[ -f $EVRMORE_SOURCE_BINARY ]]; then
+    cp $EVRMORE_SOURCE_BINARY $EVRMORE_BINARY
+    chown $EVRMORE_USER:$EVRMORE_GROUP $EVRMORE_BINARY
+    chmod +x $EVRMORE_BINARY
+    echo "Binary copied to $EVRMORE_BINARY."
+  else
+    echo "Source binary not found at $EVRMORE_SOURCE_BINARY. Please check the path." >&2
+    exit 1
+  fi
+}
+
+create_config_file() {
+  echo "Creating configuration file..."
+  if [[ ! -f $CONFIG_FILE ]]; then
+    cat << EOF > $CONFIG_FILE
+# Evrmore Configuration File
+daemon=1
+server=1
+rpcuser=evrmorerpc
+rpcpassword=$(openssl rand -hex 16)
+EOF
+    chown $EVRMORE_USER:$EVRMORE_GROUP $CONFIG_FILE
+    chmod 600 $CONFIG_FILE
+    echo "Configuration file created at $CONFIG_FILE."
+  else
+    echo "Configuration file already exists at $CONFIG_FILE."
+  fi
 }
 
 create_service_file() {
@@ -36,7 +71,7 @@ Description=Evrmore Daemon
 After=network.target
 
 [Service]
-ExecStart=$EVRMORE_BINARY
+ExecStart=$EVRMORE_BINARY -conf=$CONFIG_FILE
 User=$EVRMORE_USER
 Group=$EVRMORE_GROUP
 Restart=always
@@ -59,31 +94,22 @@ enable_and_start_service() {
   echo "Service enabled and started."
 }
 
-manage_service() {
-  echo "Evrmored service management commands:"
-  echo "  systemctl status evrmored    # Check the service status"
-  echo "  systemctl start evrmored     # Start the service"
-  echo "  systemctl stop evrmored      # Stop the service"
-  echo "  systemctl restart evrmored   # Restart the service"
-  echo "  systemctl enable evrmored    # Enable the service on boot"
-  echo "  systemctl disable evrmored   # Disable the service on boot"
-}
-
 # Main Script
 if [[ $EUID -ne 0 ]]; then
   echo "This script must be run as root." >&2
   exit 1
 fi
 
-if [[ ! -f $EVRMORE_BINARY ]]; then
-  echo "Binary not found at $EVRMORE_BINARY. Please check the path and update the script." >&2
+if [[ ! -f $EVRMORE_SOURCE_BINARY ]]; then
+  echo "Source binary not found at $EVRMORE_SOURCE_BINARY. Please check the path and update the script." >&2
   exit 1
 fi
 
 create_user_and_group
 setup_directories
+copy_binary
+create_config_file
 create_service_file
 enable_and_start_service
-manage_service
 
-echo "Installation and setup complete. Evrmore Daemon is now managed as a systemd service."
+echo "Installation complete. Evrmore Daemon is now managed as a systemd service."
