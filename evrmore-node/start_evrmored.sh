@@ -1,0 +1,3 @@
+evrmored &
+echo $! > evrmored.pid
+

@@ -1,0 +1,1 @@
+./evrmore-cli stop
