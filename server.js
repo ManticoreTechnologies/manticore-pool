@@ -4,16 +4,52 @@ const { Network } = require('./database/network.js');
 const daemon = require('./lib/daemon.js');
 const Stratum = require('./lib/index.js');
 const {options} = require('./config.js');
+const {exit} = require('process');
+
+// For testing the pool, the node is set to 9821
+// The mainnet port is 8819
 
 // Setup a daemon connection
-const Daemon = new daemon.interface([{
-    host: '127.0.0.1',
-    port: 9821,
-    user: 'user',
-    password: 'password'//
-  }], function (severity, message) {
-    console.log(severity + ': ' + message);
-  });
+let Daemon;
+
+// Read the evrmore.conf file from /mnt/evrmore/evrmore.conf 
+// find rpcuser and rpcpassword and set them to user and password
+const fs = require('fs');
+const configFile = '/home/phoenix/.evrmore/evrmore.conf';
+// For our droplets we use /mnt/evrmore/evrmore.conf
+const config = fs.readFileSync(configFile, 'utf8');
+const configLines = config.split('\n');
+const user = configLines.find(line => line.startsWith('rpcuser')).split('=')[1].trim();
+const password = configLines.find(line => line.startsWith('rpcpassword')).split('=')[1].trim();
+
+// Get the 'server.js <arg>'
+const arg = process.argv[2];
+if (arg == 'mainnet') {
+    console.log('Mainnet mode');
+    Daemon = new daemon.interface([{
+      host: '127.0.0.1',
+      port: 8819,
+      user: user,
+      password: password//
+    }], function (severity, message) {
+      console.log(severity + ': ' + message);
+    });
+}else if(arg=='testnet'){
+    console.log('Testnet mode');
+    Daemon = new daemon.interface([{
+      host: '127.0.0.1',
+      port: 9821,
+      user: user,
+      password: password//
+    }], function (severity, message) {
+      console.log(severity + ': ' + message);
+    });
+}else{
+    console.log('specify mainnet or testnet as an argument. E.g: node `server.js mainnet`');
+    exit(1);
+}
+
+
 
 // Setup the pool
 var pool = Stratum.createPool(options, function(ip, port , workerName, password, extraNonce1, version, callback){ //stratum authorization function
