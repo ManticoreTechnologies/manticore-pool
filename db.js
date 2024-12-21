@@ -20,12 +20,7 @@ async function setPoolRoundShares(roundShares) {
 
 
 
-// Our new Worker class to wrap methods mutating or accessing a single worker (e.g. EGcNAxXXXXXXXXXXXXNkd.worker1)
-async function getWorker(workerName) {
-  const worker = await db.query(`SELECT * FROM WorkerShare WHERE workerName = $1`, [workerName])
-  .then(result => result.rows.length > 0 ? new Worker(result.rows[0]) : new Worker({workername: workerName}));
-  return worker;
-}
+  
 
 async function getAddress(address) {
   const address = await db.query(`SELECT * FROM Address WHERE address = $1`, [address])
