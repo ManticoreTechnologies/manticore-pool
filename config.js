@@ -1,3 +1,10 @@
+const fs = require('fs');
+const configFile = '/home/phoenix/.evrmore/evrmore.conf';
+// For our droplets we use /mnt/evrmore/evrmore.conf
+const config = fs.readFileSync(configFile, 'utf8');
+const configLines = config.split('\n');
+const user = configLines.find(line => line.startsWith('rpcuser')).split('=')[1].trim();
+const password = configLines.find(line => line.startsWith('rpcpassword')).split('=')[1].trim();
 
 // Define the coin
 var myCoin = {
@@ -94,9 +101,9 @@ const options = {
     "daemons": [
         {
             host: '127.0.0.1',
-            port: 9821,
-            user: 'user',
-            password: 'password'
+            port: 8819,
+            user: user,   
+            password: password
          }
     ],
     "p2p": {
