@@ -1,103 +1,116 @@
-//cockroach start-single-node --insecure --listen-addr=localhost:26257 --background
-//cockroach sql --insecure
+/* We are using CockroachDB cluster for the database */
+
+// Import table definitions
+const { workerShareColumns } = require('./Tables/Workers.js');
+const { poolStatsColumns } = require('./Tables/PoolStats.js');
+const { netHistoryColumns } = require('./Tables/NetHistory.js');
+const { blocksColumns } = require('./Tables/BlockColumns.js');
+const { currentRoundColumns } = require('./Tables/CurrentRound.js');
+
+// Import the CockroachDB client
 const { Client } = require('pg');
-const path = require('path');
 
+async function initializePoolDatabase(drop=false){
+    // For production this should just create the database if it doesn't exist
+    await setupDatabase(drop);
 
-// Import the worker class from the workers.js file
-const Worker = require('./workers.js');
+    // Setup the tables
+    await setupTables(drop);
+}
 
-// Initialize database connection
-const db = new Client({
-  host: 'localhost',
+// Create a system database connection to the CockroachDB cluster
+const system_db = new Client({
+  host: 'us.pool.manticore.exchange',
   port: 26257,
-  database: 'defaultdb', // You may want to change this
+  database: 'system', // You may want to change this
   user: 'root',
   password: '', // No password for insecure mode
   ssl: false // For insecure mode
 });
 
-let connected = false;
-// Connect to database
-db.connect()
-  .then(() => {
-    connected = true;
-    console.log('Connected to CockroachDB');
-  })
-  .catch(err => {
-    console.error('Error connecting to CockroachDB:', err);
-    // Handle the error appropriately
-  });
+// This method will drop and create the database if it doesn't exist
+async function setupDatabase(drop=false) {
+  return new Promise(async (resolve, reject) => {
+  try {
+    await system_db.connect();
+    // Drop the database if it exists
+    console.log('Dropping database if it exists? ', drop);
+    if (drop) await system_db.query('DROP DATABASE IF EXISTS pool_manticore_exchange');
 
-function getConnected(){
-  return connected;
+    // Create the database if it doesn't exist
+    await system_db.query('CREATE DATABASE IF NOT EXISTS pool_manticore_exchange');
+    resolve();
+  } catch (err) {
+    console.error('Error setting up database pool_manticore_exchange:', err);
+    reject(err);
+      }
+  });
 }
 
-// Modify table creation - note SERIAL instead of INTEGER for auto-incrementing
-db.query(`
-  CREATE TABLE IF NOT EXISTS WorkerShare (
-    id SERIAL PRIMARY KEY,
-    workerName TEXT UNIQUE NOT NULL,
-    valid INT DEFAULT 0,
-    invalid INT DEFAULT 0,
-    blocks INT DEFAULT 0,
-    hashrate INT DEFAULT 0,
-    roundShares INT DEFAULT 0,
-    totalShares INT DEFAULT 0,
-    lastShareTime INT DEFAULT 0,
-    paid INT DEFAULT 0,
-    unpaid INT DEFAULT 0
-  )
-`);
+// This method will drop and create the tables
+async function setupTables(drop=false){
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await getPoolDatabase();
+      // Drop and create the tables
+      if (drop) {
+        console.log('Dropping tables');
+        await db.query('DROP TABLE IF EXISTS WorkerShare');
+        await db.query('DROP TABLE IF EXISTS PoolStats');
+        await db.query('DROP TABLE IF EXISTS NetHistory');
+        await db.query('DROP TABLE IF EXISTS Blocks');
+      }
+      
+  // Array of table definitions
+  const tables = [
+    { name: 'Workers', columns: workerShareColumns },
+    { name: 'PoolStats', columns: poolStatsColumns },
+    { name: 'NetHistory', columns: netHistoryColumns },
+    { name: 'Blocks', columns: blocksColumns },
+    { name: 'CurrentRound', columns: currentRoundColumns },
+  ];
 
-// Create PoolStats table
-db.query(`
-  CREATE TABLE IF NOT EXISTS PoolStats (
-    id SERIAL PRIMARY KEY,
-    blocks INT DEFAULT 0,
-    hashrate INT DEFAULT 0,
-    networkShares INT DEFAULT 0
-  )
-`);
+  // Create the tables
+  for (const table of tables) {
+    const createTableSQL = generateCreateTableSQL(table.name, table.columns);
+    await db.query(createTableSQL);
+      }
+      resolve();
+    } catch (err) {
+      console.error('Error setting up tables:', err);
+      reject(err);
+    }
+  });
+}
 
-// DELETE the following tables
-//db.query(`DROP TABLE IF EXISTS netHashHistory`);
-//db.query(`DROP TABLE IF EXISTS netDifficultyHistory`);
-//db.query(`DROP TABLE IF EXISTS netAssetHistory`);
-//db.query(`DROP TABLE IF EXISTS netBlockSizeHistory`);
-// Create NetStats tables //
-// Hashrate history
-db.query(`
-  CREATE TABLE IF NOT EXISTS netHashHistory (
-    hashrate FLOAT DEFAULT 0,
-    timestamp INT DEFAULT extract(epoch from current_timestamp())::INT
-  )
-`);
+// This method will return a new database connection to the pool_manticore_exchange database
+async function getPoolDatabase(){
+  return new Promise((resolve, reject) => {
+    const db = new Client({
+      host: 'ca.pool.manticore.exchange',
+      port: 26257,
+      database: 'pool_manticore_exchange',
+      user: 'root',
+      password: '',
+      ssl: false
+    });
 
-// Difficulty history
-db.query(`
-  CREATE TABLE IF NOT EXISTS netDifficultyHistory (
-    difficulty FLOAT DEFAULT 0,
-    timestamp INT DEFAULT extract(epoch from current_timestamp())::INT
-  )
-`);
-
-// Asset history
-db.query(`
-  CREATE TABLE IF NOT EXISTS netAssetHistory (
-    asset INT DEFAULT 0,
-    timestamp INT DEFAULT extract(epoch from current_timestamp())::INT
-  )
-`);
-
-// Block size history
-db.query(`
-  CREATE TABLE IF NOT EXISTS netBlockSizeHistory (
-    height INT PRIMARY KEY NOT NULL,
-    blockSize INT DEFAULT 0
-  )
-`);
+    db.connect()
+    .then(() => {
+      resolve(db);
+    })
+    .catch(err => {
+      reject(err);
+    });
+  });
+}
 
 
 
-module.exports = db;
+// Function to generate SQL for creating a table
+function generateCreateTableSQL(tableName, columns) {
+  const columnsSQL = columns.map(col => `${col.name} ${col.type}`).join(', ');
+  return `CREATE TABLE IF NOT EXISTS ${tableName} (${columnsSQL})`;
+}
+
+module.exports = { initializePoolDatabase, getPoolDatabase};

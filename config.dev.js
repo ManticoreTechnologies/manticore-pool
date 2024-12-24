@@ -1,7 +1,7 @@
 const { getUserAndPassword } = require('./utils.js');
 
 // Specify the path to the evrmore.conf file
-const evrmore_config_path = '/mnt/evrmore/evrmore.conf';
+const evrmore_config_path = '/home/phoenix/Documents/EvrmoreTestnetwork/evrmore.conf';
 
 // Extract user and password from the evrmore.conf file
 const { user, password } = getUserAndPassword(evrmore_config_path);
@@ -76,8 +76,8 @@ const options = {
     // Daemon configuration
     daemons: [
         {
-            host: '127.0.0.1',
-            port: 8819,
+            host: '0.0.0.0',
+            port: 9821,
             user: user,
             password: password
         }

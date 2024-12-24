@@ -15,7 +15,7 @@ let Daemon;
 // Read the evrmore.conf file from /mnt/evrmore/evrmore.conf 
 // find rpcuser and rpcpassword and set them to user and password
 const fs = require('fs');
-const configFile = '/mnt/evrmore/evrmore.conf';
+const configFile = '/home/phoenix/.evrmore/evrmore.conf';
 // For our droplets we use /mnt/evrmore/evrmore.conf
 const config = fs.readFileSync(configFile, 'utf8');
 const configLines = config.split('\n');
@@ -239,12 +239,12 @@ app.listen(3000, () => {
 // Main entry point 
 async function main(){
     // Now that we have handled our share shit we can check the pool address balance
-    const poolBalance = await getPoolBalance(options.address);
-    console.log('Pool balance: ' + poolBalance);
+    //const poolBalance = await getPoolBalance(options.address);
+    //console.log('Pool balance: ' + poolBalance);
     //const workers = await Workers.getAllWorkers();
     //console.log(workers);
     // Start the pool
-    //pool.start();
+    pool.start();
     
     //await Workers.resetAllWorkerData();
     
