@@ -1,4 +1,4 @@
-const { getUserAndPassword } = require('./utils.js');
+const { getUserAndPassword } = require('./utility/utils.js');
 
 // Specify the path to the evrmore.conf file
 const evrmore_config_path = '/mnt/evrmore/evrmore.conf';

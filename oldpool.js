@@ -1,3 +1,6 @@
+// Check node version, must be exactly 8.1.4. If not, then exit the program
+require('./version.check.js');
+
 // Import our shit we need
 const daemon = require('./lib/daemon.js');
 const { user, password } = require('./utils.js');
@@ -8,6 +11,8 @@ const autoflush = require('./background/autoflush.js');
 const {initializePoolDatabase, getPoolDatabase} = require('./database/db.js');
 const { startBlockCheck } = require('./background/blockcheck.js');
 const { getPoolBalance } = require('./lib/payout.js');
+const autostats = require('./background/autostats.js');
+const { Network } = require('./database/network.js');
 
 
 const MAIN_NODE = true; // Is this the main node? If it is it will handle processing payouts
@@ -35,15 +40,20 @@ var pool = Stratum.createPool(options, function(ip, port , workerName, password,
 
 });
 
+
+
+
+
 // Every share is processed here
 pool.on('share', async function(isValidShare, isValidBlock, data, db){
 
     // Log the share data
     console.log('Share received. Updating worker shares');
-
+    console.log(data);
     const worker = await Workers.getLocalWorkerBuffer(data.worker);
     const roundId = await Workers.getRoundId(db);
 
+    // Update the worker shares
     if (isValidShare) {
         worker.incrementValidShares();
         worker.incrementRoundShares();
@@ -51,6 +61,9 @@ pool.on('share', async function(isValidShare, isValidBlock, data, db){
         worker.incrementInvalidShares();
     }
     worker.incrementTotalShares();
+
+    // Update the worker hashrate
+    //worker.setHashrate(await worker.calculateHashrate(worker, data, db));
 
     if (isValidBlock){
         worker.incrementBlocks();
@@ -87,62 +100,6 @@ pool.on('newBlock', async function(block_data, db){
         await processPayouts(10, db); // Process payouts every 10 blocks
     }
 });
-
-class RestAPI {
-    constructor(db){
-        this.db = db;
-        this.express = require('express');
-        this.router = this.express.Router();
-        this.Workers = Workers;
-        
-        this.router.get('/worker/:workerName', async (req, res) => {
-          const workerName = req.params.workerName;
-          try {
-            const worker = await this.Workers.getWorker(workerName);
-            res.json(worker);
-          } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Failed to retrieve worker' });
-          }
-        });
-
-        this.router.get('/blocks', async (req, res) => {
-          const blocks = await Workers.getBlocks();
-          res.json(blocks);
-        });
-
-        this.router.get('/blocks/unpaid', async (req, res) => {
-            const unpaid_confirmed_blocks = await Workers.getUnpaidBlocks();
-            res.json(unpaid_confirmed_blocks);
-        });
-
-        this.router.get('/blocks/pending', async (req, res) => {
-            const pending_blocks = await Workers.getBlocksByStatus('pending');
-            res.json(pending_blocks);
-        });
-
-        this.router.get('/blocks/paid', async (req, res) => {
-            const paid_blocks = await Workers.getBlocksByStatus('paid');
-            res.json(paid_blocks);
-        });
-
-        this.router.get('/rounds', async (req, res) => {
-          const rounds = await Workers.getRounds();
-          res.json(rounds);
-        });
-
-   
-        this.app = this.express();
-        this.app.use('/', this.router);
-
-    }
-
-    start(port = 3000){
-        this.app.listen(port, () => {
-            console.log('Server is running on port ' + port);
-        });
-    }
-}
 
 // TODO: 
 // Add a payout system that will only run on the main node
@@ -197,25 +154,27 @@ async function main(){
 
     // Creates the database and tables if they don't exist
     // Each node will do this on startup, REMEMBER to remove the dropping code so we dont keep resetting the db on startup
-    console.log('--- Initializing database ---');
+    //console.log('--- Initializing database ---');
     // This could also just be done in the main node if we decide to set a main node
     // true to reset the entire database
     if (MAIN_NODE){
         //await initializePoolDatabase(true); // Only do this on the first launch of the main node
     }
     
-    console.log('--- Database initialized ---');
+    //console.log('--- Database initialized ---');
 
     // Get the pool database
     //const db = await getPoolDatabase();
 
     //// Start the autoflush, this will flush the workers every 10 seconds
-    const db = await autoflush.engage(5000);
+    //const db = await autoflush.engage(5000);
+    // Start the autostats, this will update the network stats every 10 seconds
+    //autostats.engage(1000, db);
 
     // Start the rest api server
-    const restapi = new RestAPI(db);
+    //const restapi = new RestAPI(db);
     // run rest api server
-    restapi.start(5030);
+    //restapi.start(5030);
 
     // test adding blocks
     //while(true){
@@ -234,8 +193,8 @@ async function main(){
 
     // For the main node we start our round processing service
 
-        
-    await startBlockCheck(db);
+    // Automated block updating, fully functional
+    //await startBlockCheck(db);
 
     // Now that the blocks are being updated we need to figure out how to process our payouts
     // can we forgoe the rounds shit? maybe we can just use the blocks table to process payouts
@@ -245,12 +204,79 @@ async function main(){
     // sum of the block rewards of all these blocks and then we can set the paid_at and paid_txid columns for each block
     // once the transaction is accepted by the node we can set the paid_at column to the current date and time
 
+    // Here we will use the space to produce a new class. This class will be a database class. 
+    // The purpose of this class will be to wrap up all the database operations into a single class. 
+    // I want to use a scalable approach to the database operations so that we can easily add new operations in the future
+    // To do this we will create a new Table for each worker to allow infinite data columns for each worker
+    // This way we can easily get worker history and current data all from one request
+
+    // The way CockroachDB works is there is a system database used to create/update/delete new databases 
+    // And then we can use those databases to create/update/delete tables and rows
+
+    // We can now create/delete databases
+    // We can also create/delete/rename tables
+    //
+
+    // Heres the schema ive decided on
+    // | -- Pool Database --
+    // | ---> Addresses Table
+    // | --------> address_id (Primary Key)
+    // | --------> address (VARCHAR(255))
+    // | --------> created_at (TIMESTAMP)
+    // | --------> last_active (TIMESTAMP)
+    // | ---> Workers Table
+    // | --------> worker_id (Primary Key)
+    // | --------> worker_name (VARCHAR(255))
+    // | --------> password (VARCHAR(255))
+    // | --------> status (ENUM: active, inactive, banned)
+    // | --------> last_active (TIMESTAMP)
+    // | ----> Shares Table
 
 
-    //await Workers.resetAllBlocksToUnpaid();
+    // Create a new cockroachdb instance
+    const CockroachDB = require('./Database/CockroachDB/cockroachdb.js');
+    const cockroachdb = new CockroachDB();
+    await cockroachdb.database.connect();
 
+    // Purge all NON SYSTEM databases
+    //await cockroachdb.purgeDatabases();
+
+    // Create a new database for each address 
+    await cockroachdb.database.create('evrxxxxxxxxxxxxxx');
+
+    // Connect to the pool database
+    await cockroachdb.database.connect('evrxxxxxxxxxxxxxx');
+
+    // We should store these table configs in a file 
+    const share_columns = [
+        ['timestamp', 'TIMESTAMP PRIMARY KEY'],
+        ['worker_name', 'VARCHAR(255)'], // The name provided by the miner (eg worker1)
+        ['block_hash', 'VARCHAR(255)'],
+        ['block_txid', 'VARCHAR(255)'],
+        ['target_difficulty', 'FLOAT'],
+        ['share_difficulty', 'FLOAT'],
+        ['valid_share', 'BOOLEAN'],
+        ['valid_block', 'BOOLEAN'],
+        ['block_height', 'INT'],
+        ['block_reward', 'INT'],
+        ['hashrate', 'FLOAT'],
+    ];
+
+    // Create a new table for each address 
+    await cockroachdb.table.create('shares', share_columns);
+
+    await cockroachdb.row.insert('shares', ['worker_name', 'timestamp', 'valid_share', 'valid_block', 'target_difficulty', 'share_difficulty', 'block_height', 'block_reward', 'block_hash', 'block_txid'], ['worker1', new Date(), true, true, 1, 1, 1, 1, '0x1234567890abcdef', '0x1234567890abcdef']);
+    await cockroachdb.row.insert('shares', ['worker_name', 'timestamp', 'valid_share', 'valid_block', 'target_difficulty', 'share_difficulty', 'block_height', 'block_reward', 'block_hash', 'block_txid'], ['worker2', new Date(), true, false, 1, 1, 1, 1, '0x1234567890abcdef', '0x1234567890abcdef']);
+    
+    // Ensure we are connected to the correct database
+    await cockroachdb.database.connect('evrxxxxxxxxxxxxxx');
+    // Select all the valid shares for the worker 
+    const address_shares = await cockroachdb.row.select('shares', ['*'], ['valid_share = true']);
+    console.log(address_shares.length)
+
+    
     // Start the pool
-    pool.start(db);
+    //pool.start(db);
 
 }
 

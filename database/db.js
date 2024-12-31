@@ -6,7 +6,7 @@ const { poolStatsColumns } = require('./Tables/PoolStats.js');
 const { netHistoryColumns } = require('./Tables/NetHistory.js');
 const { blocksColumns } = require('./Tables/BlockColumns.js');
 const { currentRoundColumns } = require('./Tables/CurrentRound.js');
-
+const { netStatsColumns } = require('./Tables/NetStats.js');
 // Import the CockroachDB client
 const { Client } = require('pg');
 
@@ -20,7 +20,7 @@ async function initializePoolDatabase(drop=false){
 
 // Create a system database connection to the CockroachDB cluster
 const system_db = new Client({
-  host: 'us.pool.manticore.exchange',
+  host: 'au.pool.manticore.exchange',
   port: 26257,
   database: 'system', // You may want to change this
   user: 'root',
@@ -59,6 +59,7 @@ async function setupTables(drop=false){
         await db.query('DROP TABLE IF EXISTS PoolStats');
         await db.query('DROP TABLE IF EXISTS NetHistory');
         await db.query('DROP TABLE IF EXISTS Blocks');
+        await db.query('DROP TABLE IF EXISTS NetStats');
       }
       
   // Array of table definitions
@@ -68,6 +69,7 @@ async function setupTables(drop=false){
     { name: 'NetHistory', columns: netHistoryColumns },
     { name: 'Blocks', columns: blocksColumns },
     { name: 'CurrentRound', columns: currentRoundColumns },
+    { name: 'NetStats', columns: netStatsColumns },
   ];
 
   // Create the tables

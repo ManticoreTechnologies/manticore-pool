@@ -8,6 +8,48 @@ class Worker {
       Object.assign(this, workerData);
 
     }
+
+    async calculateHashrate(worker, data, db=null){
+      if (db === null) db = await getPoolDatabase();
+      // Get the submit time for the current share in seconds
+      const currentSubmitTime = data.submitTime / 1000 || 0
+      console.log(worker)
+      // Get the last share time for the worker in seconds
+      const lastShareTime = worker.lastsharetime / 1000 || 0
+      
+      // Calculate the share time difference
+      const shareTimeDifference = currentSubmitTime - lastShareTime;
+
+      // Update historical share times with the difference
+      await WorkerShare.updateHistoricalShareTimes(worker.workername, shareTimeDifference);
+
+      // Get the average share time
+      let averageShareTime = 0;
+      if (worker.historicalsharetimes !== undefined) {
+        averageShareTime = worker.historicalsharetimes.reduce((a, b) => a + b, 0) / worker.historicalsharetimes.length;
+      } else {
+        averageShareTime = 0;
+      }
+  
+      // Get the pool difficulty
+      const poolDifficulty = data.difficulty
+  
+      // Calculate the hashrate based on pool difficulty and share time in Hashes per second
+      let hashrate = Math.floor((poolDifficulty*(Math.pow(2, 32)) / averageShareTime))
+      if (hashrate == Infinity) {
+        hashrate = 0;
+      }
+      if (isNaN(hashrate)) {
+        hashrate = 0;
+      }
+      if (hashrate < 0) {
+        hashrate = 0;
+      }
+      if (hashrate > 1000000000) {
+        hashrate = 1000000000;
+      }
+      return hashrate;
+  }
   
     /* Increment Mutators */ /* Tested: Working!  */
     incrementValidShares(shares=1) {
@@ -23,6 +65,7 @@ class Worker {
       console.log('incrementRoundShares: '+Workers.getUpdateBuffer(this.workername).roundshares);
     } 
     incrementTotalShares(shares=1) {
+      this.setLastShareTime(Date.now());
       Workers.getUpdateBuffer(this.workername).totalshares += parseInt(shares);
       console.log('incrementTotalShares: '+Workers.getUpdateBuffer(this.workername).totalshares);
     }
@@ -43,67 +86,69 @@ class Worker {
       Workers.getUpdateBuffer(this.workername).roundshares = roundShares;
       console.log('setRoundShares: '+Workers.getUpdateBuffer(this.workername).roundshares);
     }
+
     // Setter Mutators
     setHashrate(hashrate) {
-      this.hashrate = hashrate;
-      this.save();
+      Workers.getUpdateBuffer(this.workername).hashrate = hashrate;
+      console.log('setHashrate: '+Workers.getUpdateBuffer(this.workername).hashrate);
     }
+
     setLastShareTime(lastShareTime) {
-      this.lastsharetime = lastShareTime;
-      this.save();
+      Workers.getUpdateBuffer(this.workername).lastsharetime = lastShareTime;
+      console.log('setLastShareTime: '+Workers.getUpdateBuffer(this.workername).lastsharetime);
     }
     setPaid(paid) {
-      this.paid = paid;
-      this.save();
+      Workers.getUpdateBuffer(this.workername).paid = paid;
+      console.log('setPaid: '+Workers.getUpdateBuffer(this.workername).paid);
     }
     setUnpaid(unpaid) {
-      this.unpaid = unpaid;
-      this.save();
+      Workers.getUpdateBuffer(this.workername).unpaid = unpaid;
+      console.log('setUnpaid: '+Workers.getUpdateBuffer(this.workername).unpaid);
     }
   
   
     // Getters
     getPaid() {
-      return this.paid;
+      return Workers.getUpdateBuffer(this.workername).paid;
     }
     getUnpaid() {
-      return this.unpaid;
+      return Workers.getUpdateBuffer(this.workername).unpaid;
     }
     getValid() {
-      return this.valid;
+      return Workers.getUpdateBuffer(this.workername).valid;
     }
     getInvalid() {
-      return this.invalid;
+      return Workers.getUpdateBuffer(this.workername) .invalid;
     }
     getBlocks() {
-      return this.blocks;
+      return Workers.getUpdateBuffer(this.workername).blocks;
     }
     getHashrate() {
-      return this.hashrate;
+      return Workers.getUpdateBuffer(this.workername) .hashrate;
     }
     getRoundShares() {
-      return this.roundshares;
+      return Workers.getUpdateBuffer(this.workername).roundshares;
     }
     getTotalShares() {
-      return this.totalshares;
+      return Workers.getUpdateBuffer(this.workername) .totalshares;
     }
     getLastShareTime() {
-      return this.lastsharetime;
+      return Workers.getUpdateBuffer(this.workername) .lastsharetime;
     }
   
   
     /* Purge Mutators */
     purgeWorkerData() {
-      this.valid = 0;
-      this.invalid = 0;
-      this.blocks = 0;
-      this.hashrate = 0;
-      this.roundshares = 0;
-      this.totalshares = 0;
-      this.lastsharetime = 0;
-      this.paid = 0;
-      this.unpaid = 0;
-      this.save();
+      Workers.getUpdateBuffer(this.workername).valid = 0;
+      Workers.getUpdateBuffer(this.workername).invalid = 0;
+      Workers.getUpdateBuffer(this.workername).blocks = 0;
+      Workers.getUpdateBuffer(this.workername).hashrate = 0;
+      Workers.getUpdateBuffer(this.workername).roundshares = 0;
+      Workers.getUpdateBuffer(this.workername).totalshares = 0;
+      Workers.getUpdateBuffer(this.workername).lastsharetime = 0;
+      Workers.getUpdateBuffer(this.workername).paid = 0;
+      Workers.getUpdateBuffer(this.workername).unpaid = 0;
+      console.log('purgeWorkerData: '+Workers.getUpdateBuffer(this.workername));
     }
   
     async save() {
@@ -112,7 +157,7 @@ class Worker {
         [
           this.valid, 
           this.invalid, 
-          this.blocks, 
+          this.blocks,
           this.hashrate, 
           this.roundshares, 
           this.totalshares, 
@@ -132,13 +177,13 @@ class Workers {
             Workers.updateBuffer = {}; // Initialize the updateBuffer object if it doesn't exist
         }
         if (!Workers.updateBuffer[workerName]) {
-            Workers.updateBuffer[workerName] = { valid: 0, roundshares: 0, totalshares: 0, blocks: 0, unpaid: 0, paid: 0};
+            Workers.updateBuffer[workerName] = { valid: 0, roundshares: 0, totalshares: 0, blocks: 0, unpaid: 0, paid: 0, hashrate: 0, lastsharetime: 0};
         }
         if (workerName === 'testWorker') console.log(Workers.updateBuffer[workerName]);
         return Workers.updateBuffer[workerName];
     }
     static resetUpdateBuffer(workerName) {
-      Workers.updateBuffer[workerName] = { valid: 0, roundshares: 0, totalshares: 0, blocks: 0, unpaid: 0, paid: 0 };
+      Workers.updateBuffer[workerName] = { valid: 0, roundshares: 0, totalshares: 0, blocks: 0, unpaid: 0, paid: 0, hashrate: 0, lastsharetime: 0};
     }
 
     static async initWorker(workerName, db=null) {
@@ -159,6 +204,7 @@ class Workers {
     const result = await db.query(`SELECT * FROM Workers WHERE workername = $1`, [workerName]);
     if (result.rows.length > 0) {
         Workers.getUpdateBuffer(workerName); // Ensure buffer is initialized
+        console.log(result.rows[0]);
         return new Worker(result.rows[0]);
     } else {
         return Workers.initWorker(workerName);
@@ -172,7 +218,10 @@ static async getLocalWorkerBuffer(workerName) {
     roundshares: parseInt(buffer.roundshares),
     totalshares: parseInt(buffer.totalshares),
     blocks: parseInt(buffer.blocks),
-    unpaid: parseInt(buffer.unpaid)
+    unpaid: parseInt(buffer.unpaid),
+    paid: parseInt(buffer.paid),
+    hashrate: parseInt(buffer.hashrate),
+    lastsharetime: parseInt(buffer.lastsharetime),
   });
 }
     // End the round when the pool finds a block
@@ -338,21 +387,41 @@ static async getLocalWorkerBuffer(workerName) {
     }
 
     static async flushAllUpdates(db=null) {
-      console.log('Flushing all updates');
+        console.log('Flushing all updates');
         if (db === null) db = await getPoolDatabase();
         const workers = await this.getAllWorkers(db);
         for (const worker of workers) {
             const buffer = this.getUpdateBuffer(worker.workername);
             if (Object.values(buffer).some(value => value !== 0)) {
+                const timestamp = new Date().toISOString();
+                const hashrate = parseFloat(buffer.hashrate) || 0; // Ensure hashrate is a float
+                const shareTime = parseFloat(buffer.lastsharetime) || 0; // Ensure shareTime is a float
+
                 await db.query(
-                    `UPDATE Workers SET valid = valid + $1, roundshares = roundshares + $2, totalshares = totalshares + $3, blocks = blocks + $4, unpaid = unpaid + $5, paid = paid + $6 WHERE workername = $7`,
+                    `UPDATE Workers 
+                     SET valid = valid + $1, 
+                         roundshares = roundshares + $2, 
+                         totalshares = totalshares + $3, 
+                         blocks = blocks + $4, 
+                         unpaid = unpaid + $5, 
+                         paid = paid + $6,
+                         hashrate = hashrate + $7,
+                         lastsharetime = lastsharetime + $8,
+                         dailyHashrate = COALESCE(dailyHashrate, '[]'::jsonb) || jsonb_build_array(jsonb_build_object('timestamp', $9::text, 'hashrate', $10::float)),
+                         historicalShareTimes = COALESCE(historicalShareTimes, '[]'::jsonb) || jsonb_build_array(jsonb_build_object('timestamp', $9::text, 'shareTime', $11::float))
+                     WHERE workername = $12`,
                     [
-                        buffer.valid,
-                        buffer.roundshares,
-                        buffer.totalshares,
-                        buffer.blocks,
-                        buffer.unpaid,
-                        buffer.paid,
+                        parseInt(buffer.valid, 10),
+                        parseInt(buffer.roundshares, 10),
+                        parseInt(buffer.totalshares, 10),
+                        parseInt(buffer.blocks, 10),
+                        parseInt(buffer.unpaid, 10),
+                        parseInt(buffer.paid, 10),
+                        parseInt(buffer.hashrate, 10),
+                        parseInt(buffer.lastsharetime, 10),
+                        timestamp,
+                        hashrate,
+                        shareTime,
                         worker.workername
                     ]
                 );
