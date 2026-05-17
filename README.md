@@ -165,6 +165,8 @@ Useful environment variables:
 	POOL_ADDRESS=pool-block-reward-address
 	POOL_FEE_ADDRESS=pool-fee-address
 	POOL_FEE=0.01
+	STRATUM_HOST=0.0.0.0
+	API_HOST=0.0.0.0
 	API_PORT=3000
 	POOL_STATE_FILE=/path/to/pool-state.json
 
@@ -184,9 +186,20 @@ The JSON API and browser dashboard are served from the same process:
 	http://your-pool-host:3000/api/workers
 	http://your-pool-host:3000/api/netstats
 
+For a public VPS dashboard, keep `API_HOST=0.0.0.0` and allow TCP `API_PORT`
+through both the OS firewall and the VPS/cloud provider firewall or security group.
+On AWS EC2, this means adding an inbound security-group rule for TCP 3000 from
+your IP or `0.0.0.0/0` if you intentionally want it public.
+
 Miners connect to the stratum ports configured in `config.js` (3333 and 3334 by default):
 
 	stratum+tcp://<evrmore-address>.<worker-name>@your-pool-host:3333
+
+For public miners or MiningRigRentals, keep `STRATUM_HOST=0.0.0.0` and open
+TCP 3333 and 3334 through both the OS firewall and the VPS/cloud provider
+firewall or security group. On AWS EC2, add inbound security-group rules for
+TCP 3333, 3334, and 3000; UFW alone is not enough if the security group blocks
+the traffic.
 	
 Then on the Windows box, launch the miner. For example:
 

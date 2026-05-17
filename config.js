@@ -38,7 +38,8 @@ const evrmore = {
 
 // Define pool options
 const options = {
-    remoteAddress: process.env.POOL_BIND_ADDRESS || "0.0.0.0",
+    bindAddress: process.env.STRATUM_HOST || process.env.POOL_BIND_ADDRESS || "0.0.0.0",
+    remoteAddress: process.env.STRATUM_HOST || process.env.POOL_BIND_ADDRESS || "0.0.0.0",
     coin: evrmore,
     poolFee: parseNumber(process.env.POOL_FEE, 0.01),
     address: process.env.POOL_ADDRESS || fileConfig.miningaddress || "EcmFc6abS8xPkMpzWrZSo9yEU2jgcDhkzd",
