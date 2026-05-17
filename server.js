@@ -135,7 +135,8 @@ pool.on('share', function (isValidShare, isValidBlock, data) {
     const result = stats.recordShare(isValidShare, isValidBlock, data || {});
     const status = isValidShare ? 'accepted' : 'rejected';
     const blockStatus = isValidBlock ? ' block-candidate' : '';
-    console.log(`Share ${status}${blockStatus}: ${result.worker.workername}`);
+    const reason = data && data.error ? ` (${data.error})` : '';
+    console.log(`Share ${status}${blockStatus}: ${result.worker.workername}${reason}`);
 });
 
 pool.on('newBlock', async function (block) {

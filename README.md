@@ -172,6 +172,7 @@ Useful environment variables:
 	JOB_REBROADCAST_TIMEOUT=90
 	SHARE_VALIDATION_CONCURRENCY=1
 	SHARE_VALIDATION_QUEUE_SIZE=256
+	ENFORCE_NONCE_PREFIX=false
 	POOL_STATE_FILE=/path/to/pool-state.json
 
 On the remote Evrmore node, make sure `evrmore.conf` allows RPC from the pool server's IP. Example:
@@ -187,6 +188,10 @@ For a remote node, keep `BLOCK_REFRESH_INTERVAL` at 10000ms or higher and
 `SHARE_VALIDATION_CONCURRENCY=1` unless the node has been tuned for heavier RPC
 load. `getevrprogpowhash` is called for share validation, so high-rental traffic
 can otherwise fill the Evrmore RPC work queue.
+
+MRR and several Evrprogpow miners do not reserve nonce ranges using the stratum
+extranonce, so `ENFORCE_NONCE_PREFIX` defaults to `false`. Turn it on only if
+all connected miners are known to honor the assigned nonce prefix.
 
 The JSON API and browser dashboard are served from the same process:
 

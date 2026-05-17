@@ -56,6 +56,7 @@ const options = {
     jobRebroadcastTimeout: parseNumber(process.env.JOB_REBROADCAST_TIMEOUT, 90),
     maxShareValidationConcurrency: parseNumber(process.env.SHARE_VALIDATION_CONCURRENCY, 1),
     maxShareValidationQueue: parseNumber(process.env.SHARE_VALIDATION_QUEUE_SIZE, 256),
+    enforceNoncePrefix: process.env.ENFORCE_NONCE_PREFIX === 'true',
 
     // Connection management
     connectionTimeout: 1200, // Timeout for inactive workers in seconds
