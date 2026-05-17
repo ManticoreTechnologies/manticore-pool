@@ -168,6 +168,10 @@ Useful environment variables:
 	STRATUM_HOST=0.0.0.0
 	API_HOST=0.0.0.0
 	API_PORT=3000
+	BLOCK_REFRESH_INTERVAL=10000
+	JOB_REBROADCAST_TIMEOUT=90
+	SHARE_VALIDATION_CONCURRENCY=1
+	SHARE_VALIDATION_QUEUE_SIZE=256
 	POOL_STATE_FILE=/path/to/pool-state.json
 
 On the remote Evrmore node, make sure `evrmore.conf` allows RPC from the pool server's IP. Example:
@@ -177,6 +181,12 @@ On the remote Evrmore node, make sure `evrmore.conf` allows RPC from the pool se
 	rpcallowip=<pool-server-public-or-private-ip>
 	rpcuser=<rpcuser>
 	rpcpassword=<rpcpassword>
+	rpcworkqueue=128
+
+For a remote node, keep `BLOCK_REFRESH_INTERVAL` at 10000ms or higher and
+`SHARE_VALIDATION_CONCURRENCY=1` unless the node has been tuned for heavier RPC
+load. `getevrprogpowhash` is called for share validation, so high-rental traffic
+can otherwise fill the Evrmore RPC work queue.
 
 The JSON API and browser dashboard are served from the same process:
 

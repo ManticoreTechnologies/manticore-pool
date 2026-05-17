@@ -51,9 +51,11 @@ const options = {
         "eHNUGzw8ZG9PGC8gKtnneyMaQXQTtAUm98": 10 // 10% to Miner dev fund
     },
 
-    blockRefreshInterval: parseNumber(process.env.BLOCK_REFRESH_INTERVAL, 1000),
+    blockRefreshInterval: parseNumber(process.env.BLOCK_REFRESH_INTERVAL, 10000),
     getNewBlockAfterFound: true, // Automatically get new block after finding one
-    jobRebroadcastTimeout: 55, // Timeout for rebroadcasting jobs
+    jobRebroadcastTimeout: parseNumber(process.env.JOB_REBROADCAST_TIMEOUT, 90),
+    maxShareValidationConcurrency: parseNumber(process.env.SHARE_VALIDATION_CONCURRENCY, 1),
+    maxShareValidationQueue: parseNumber(process.env.SHARE_VALIDATION_QUEUE_SIZE, 256),
 
     // Connection management
     connectionTimeout: 1200, // Timeout for inactive workers in seconds
