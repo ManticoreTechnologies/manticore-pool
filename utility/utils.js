@@ -1,18 +1,38 @@
-// Get the user and password from the evrmore.conf file
+// Helpers for reading evrmore.conf-style key/value files.
 
-function getUserAndPassword(path) { 
-    const fs = require('fs');
-    const configFile = path;
-    const config = fs.readFileSync(configFile, 'utf8');
-    const configLines = config.split('\n');
-    const user = configLines.find(line => line.startsWith('rpcuser')).split('=')[1].trim();
-    const password = configLines.find(line => line.startsWith('rpcpassword')).split('=')[1].trim();
-    return {
-        user,
-        password
+const fs = require('fs');
+
+function parseConfigFile(path) {
+    if (!path || !fs.existsSync(path)) {
+        return {};
     }
+
+    return fs.readFileSync(path, 'utf8')
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line && line[0] !== '#')
+        .reduce((config, line) => {
+            const separator = line.indexOf('=');
+            if (separator === -1) {
+                return config;
+            }
+
+            const key = line.slice(0, separator).trim();
+            const value = line.slice(separator + 1).trim();
+            config[key] = value;
+            return config;
+        }, {});
+}
+
+function getUserAndPassword(path) {
+    const config = parseConfigFile(path);
+    return {
+        user: config.rpcuser || process.env.EVR_RPC_USER || process.env.EVRMORE_RPC_USER || '',
+        password: config.rpcpassword || process.env.EVR_RPC_PASSWORD || process.env.EVRMORE_RPC_PASSWORD || ''
+    };
 }
 
 module.exports = {
-    getUserAndPassword
-}
+    getUserAndPassword,
+    parseConfigFile
+};

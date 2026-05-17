@@ -140,6 +140,36 @@ values. If it ends prematurely with the "default_witness_commitment" value then 
 To run EPSS, enter the following on the EPSS VM from directory "~/evrmore-personal-stratum-server":
 
 	node server.js
+
+For the pool build in this fork, the preferred launch command is:
+
+	npm install
+	EVRMORE_CONF=/mnt/evrmore/evrmore.conf POOL_ADDRESS=your-pool-payout-address npm start
+
+Useful environment variables:
+
+	EVRMORE_CONF=/path/to/evrmore.conf
+	EVR_RPC_HOST=127.0.0.1
+	EVR_RPC_PORT=8819
+	EVR_RPC_USER=rpcuser-if-not-in-conf
+	EVR_RPC_PASSWORD=rpcpassword-if-not-in-conf
+	POOL_ADDRESS=pool-block-reward-address
+	POOL_FEE_ADDRESS=pool-fee-address
+	POOL_FEE=0.01
+	API_PORT=3000
+	POOL_STATE_FILE=/path/to/pool-state.json
+
+The JSON API and browser dashboard are served from the same process:
+
+	http://your-pool-host:3000/
+	http://your-pool-host:3000/dashboard/<miner-address>
+	http://your-pool-host:3000/api/poolstats
+	http://your-pool-host:3000/api/workers
+	http://your-pool-host:3000/api/netstats
+
+Miners connect to the stratum ports configured in `config.js` (3333 and 3334 by default):
+
+	stratum+tcp://<evrmore-address>.<worker-name>@your-pool-host:3333
 	
 Then on the Windows box, launch the miner. For example:
 

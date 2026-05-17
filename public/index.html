@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EVR Pool Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Evrmore Pool</p>
+      <h1>Pool Dashboard</h1>
+      <p class="muted">Live stratum, miner, block, and network stats from this pool instance.</p>
+    </div>
+    <div class="status" id="health">Connecting...</div>
+  </header>
+
+  <main>
+    <section class="grid cards">
+      <article>
+        <span>Pool Hashrate</span>
+        <strong id="pool-hashrate">0 H/s</strong>
+      </article>
+      <article>
+        <span>Active Miners</span>
+        <strong id="active-miners">0</strong>
+      </article>
+      <article>
+        <span>Blocks Found</span>
+        <strong id="blocks-found">0</strong>
+      </article>
+      <article>
+        <span>Valid / Invalid Shares</span>
+        <strong><span id="valid-shares">0</span> / <span id="invalid-shares">0</span></strong>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Network</h2>
+          <p class="muted">Connected Evrmore node status.</p>
+        </div>
+        <button id="refresh">Refresh</button>
+      </div>
+      <div class="grid stats">
+        <div><span>Height</span><strong id="net-height">-</strong></div>
+        <div><span>Difficulty</span><strong id="net-difficulty">-</strong></div>
+        <div><span>Network Hashrate</span><strong id="net-hashrate">-</strong></div>
+        <div><span>Pool Network Share</span><strong id="network-share">-</strong></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Workers</h2>
+          <p class="muted">Append an address to the URL, for example <code>/dashboard/E...</code>, to filter.</p>
+        </div>
+        <input id="address-filter" placeholder="Filter by payout address">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Worker</th>
+              <th>Hashrate</th>
+              <th>Valid</th>
+              <th>Invalid</th>
+              <th>Blocks</th>
+              <th>Unpaid</th>
+              <th>Last Share</th>
+            </tr>
+          </thead>
+          <tbody id="workers"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Recent Blocks</h2>
+          <p class="muted">Block candidates submitted by the pool.</p>
+        </div>
+      </div>
+      <div id="blocks" class="list"></div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

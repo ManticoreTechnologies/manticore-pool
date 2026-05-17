@@ -1,9 +1,30 @@
-const { getUserAndPassword } = require('./utility/utils.js');
+const { getUserAndPassword, parseConfigFile } = require('./utility/utils.js');
 
-// Specify the path to the evrmore.conf file
-const evrmore_config_path = '/home/phoenix/Documents/EvrmoreTestnetwork/evrmore.conf';
+const DEFAULT_CONF_PATHS = [
+    process.env.EVRMORE_CONF,
+    process.env.EVR_CONF,
+    `${process.env.HOME || ''}/.evrmore/evrmore-testnet/evrmore.conf`,
+    `${process.env.HOME || ''}/.evrmore/evrmore.conf`,
+    '/mnt/evrmore/evrmore.conf'
+].filter(Boolean);
 
-// Extract user and password from the evrmore.conf file
+function firstExistingPath(paths) {
+    const fs = require('fs');
+    for (const filePath of paths) {
+        if (fs.existsSync(filePath)) {
+            return filePath;
+        }
+    }
+    return paths[0];
+}
+
+function parseNumber(value, fallback) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+const evrmore_config_path = firstExistingPath(DEFAULT_CONF_PATHS);
+const fileConfig = parseConfigFile(evrmore_config_path);
 const { user, password } = getUserAndPassword(evrmore_config_path);
 
 // Define coin data
@@ -17,19 +38,19 @@ const evrmore = {
 
 // Define pool options
 const options = {
-    remoteAddress: "0.0.0.0",
+    remoteAddress: process.env.POOL_BIND_ADDRESS || "0.0.0.0",
     coin: evrmore,
-    poolFee: 0.01,
-    address: "EcmFc6abS8xPkMpzWrZSo9yEU2jgcDhkzd", // Pool wallet address for block rewards
-    feeAddress: "EWop2wCsufxboP19De9tY3hMaPKNUiUupL", // Address for pool fees
-    payoutThreshold: 100000, // Minimum payout threshold
+    poolFee: parseNumber(process.env.POOL_FEE, 0.01),
+    address: process.env.POOL_ADDRESS || fileConfig.miningaddress || "EcmFc6abS8xPkMpzWrZSo9yEU2jgcDhkzd",
+    feeAddress: process.env.POOL_FEE_ADDRESS || "EWop2wCsufxboP19De9tY3hMaPKNUiUupL",
+    payoutThreshold: parseNumber(process.env.PAYOUT_THRESHOLD, 100000),
 
     // Reward recipients configuration
     rewardRecipients: {
         "eHNUGzw8ZG9PGC8gKtnneyMaQXQTtAUm98": 10 // 10% to Miner dev fund
     },
 
-    blockRefreshInterval: 1000, // Poll interval for new blocks in milliseconds
+    blockRefreshInterval: parseNumber(process.env.BLOCK_REFRESH_INTERVAL, 1000),
     getNewBlockAfterFound: true, // Automatically get new block after finding one
     jobRebroadcastTimeout: 55, // Timeout for rebroadcasting jobs
 
@@ -52,23 +73,23 @@ const options = {
     // Port configuration for miners
     ports: {
         "3333": {
-            diff: 0.003, // Pool difficulty
+            diff: parseNumber(process.env.STRATUM_DIFF, 0.003),
             varDiff: {
-                minDiff: 0.003,
-                maxDiff: 512,
-                targetTime: 5, // Target time for shares in seconds
-                retargetTime: 1, // Retarget interval in seconds
-                variancePercent: 15 // Allowed variance percentage
+                minDiff: parseNumber(process.env.STRATUM_MIN_DIFF, 0.003),
+                maxDiff: parseNumber(process.env.STRATUM_MAX_DIFF, 512),
+                targetTime: parseNumber(process.env.STRATUM_TARGET_TIME, 5),
+                retargetTime: parseNumber(process.env.STRATUM_RETARGET_TIME, 30),
+                variancePercent: parseNumber(process.env.STRATUM_VARIANCE_PERCENT, 15)
             }
         },
         "3334": {
-            diff: 0.003,
+            diff: parseNumber(process.env.STRATUM_DIFF, 0.003),
             varDiff: {
-                minDiff: 0.003,
-                maxDiff: 512,
-                targetTime: 5,
-                retargetTime: 60,
-                variancePercent: 15
+                minDiff: parseNumber(process.env.STRATUM_MIN_DIFF, 0.003),
+                maxDiff: parseNumber(process.env.STRATUM_MAX_DIFF, 512),
+                targetTime: parseNumber(process.env.STRATUM_TARGET_TIME, 5),
+                retargetTime: parseNumber(process.env.STRATUM_RETARGET_TIME, 60),
+                variancePercent: parseNumber(process.env.STRATUM_VARIANCE_PERCENT, 15)
             }
         }
     },
@@ -76,8 +97,8 @@ const options = {
     // Daemon configuration
     daemons: [
         {
-            host: '0.0.0.0',
-            port: 9821,
+            host: process.env.EVR_RPC_HOST || '127.0.0.1',
+            port: parseNumber(process.env.EVR_RPC_PORT || fileConfig.rpcport, 9821),
             user: user,
             password: password
         }
@@ -92,4 +113,4 @@ const options = {
     }
 };
 
-module.exports = { options };
+module.exports = { options, evrmore_config_path };
