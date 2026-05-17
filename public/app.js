@@ -25,6 +25,13 @@ function byId(id) {
   return document.getElementById(id);
 }
 
+function setText(id, value) {
+  var el = byId(id);
+  if (el) {
+    el.textContent = value;
+  }
+}
+
 function escapeHtml(value) {
   return String(value == null ? '' : value)
     .replace(/&/g, '&amp;')
@@ -32,6 +39,13 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+function shortAddress(address) {
+  if (!address) {
+    return 'Pool-wide';
+  }
+  return address.length > 18 ? address.slice(0, 9) + '...' + address.slice(-7) : address;
 }
 
 function currentAddressFilter() {
@@ -76,20 +90,26 @@ async function sendJson(url, method, body) {
 }
 
 function renderPool(pool) {
-  byId('pool-hashrate').textContent = formatHashrate(pool.hashrate);
-  byId('active-miners').textContent = pool.activeMiners || 0;
-  byId('blocks-found').textContent = pool.blocksFound || 0;
-  byId('valid-shares').textContent = pool.validShares || 0;
-  byId('invalid-shares').textContent = pool.invalidShares || 0;
-  byId('pool-unpaid').textContent = formatEvr(pool.unpaid);
-  byId('pool-paid').textContent = formatEvr(pool.paid) + ' paid';
+  setText('pool-hashrate', formatHashrate(pool.hashrate));
+  setText('active-miners', pool.activeMiners || 0);
+  setText('blocks-found', pool.blocksFound || 0);
+  setText('valid-shares', pool.validShares || 0);
+  setText('invalid-shares', pool.invalidShares || 0);
+  setText('pool-unpaid', formatEvr(pool.unpaid));
+  setText('pool-paid', formatEvr(pool.paid) + ' paid');
 }
 
 function renderNetwork(net) {
-  byId('net-height').textContent = net.height || '-';
-  byId('net-difficulty').textContent = net.difficulty ? Number(net.difficulty).toLocaleString() : '-';
-  byId('net-hashrate').textContent = formatHashrate(net.hashrate);
-  byId('network-share').textContent = net.networkShare ? (net.networkShare * 100).toFixed(6) + '%' : '0%';
+  setText('net-height', net.height || '-');
+  setText('net-difficulty', net.difficulty ? Number(net.difficulty).toLocaleString() : '-');
+  setText('net-hashrate', formatHashrate(net.hashrate));
+  setText('network-share', net.networkShare ? (net.networkShare * 100).toFixed(6) + '%' : '0%');
+}
+
+function renderConfig(config) {
+  var ports = config.stratumPorts && config.stratumPorts.length ? config.stratumPorts.join(' / ') : '3333 / 3334';
+  setText('stratum-signal', ports);
+  setText('payout-mode', config.payoutsEnabled ? 'Auto armed' : 'Manual');
 }
 
 function renderWorkers(workers) {
@@ -161,10 +181,11 @@ function renderMiner(summary) {
   var prefs = summary && summary.preferences ? summary.preferences : {};
   var candidates = summary && summary.payoutCandidates ? summary.payoutCandidates : { total: 0 };
 
-  byId('miner-address-label').textContent = address || '-';
-  byId('miner-hashrate').textContent = formatHashrate(totals.hashrate);
-  byId('miner-unpaid').textContent = formatEvr(totals.unpaid);
-  byId('miner-eligible').textContent = formatEvr(candidates.total);
+  setText('miner-address-label', address ? shortAddress(address) : '-');
+  setText('miner-hashrate', formatHashrate(totals.hashrate));
+  setText('miner-unpaid', formatEvr(totals.unpaid));
+  setText('miner-eligible', formatEvr(candidates.total));
+  setText('selected-address-readout', shortAddress(address));
   byId('auto-payout').checked = prefs.autoPayout === true;
   byId('payout-threshold').value = satsToEvrNumber(prefs.payoutThreshold).toFixed(8);
   byId('miner-link').href = address ? '/dashboard/' + encodeURIComponent(address) : '#';
@@ -176,6 +197,7 @@ async function refresh() {
     var address = currentAddressFilter();
     var workersUrl = address ? '/api/workers/' + encodeURIComponent(address) : '/api/workers';
     var requests = [
+      getJson('/api/config'),
       getJson('/api/poolstats'),
       getJson('/api/netstats').catch(function(error) { return { error: error.message }; }),
       getJson(workersUrl),
@@ -187,20 +209,21 @@ async function refresh() {
     }
     var results = await Promise.all(requests);
 
-    renderPool(results[0]);
-    if (!results[1].error) {
-      renderNetwork(results[1]);
+    renderConfig(results[0]);
+    renderPool(results[1]);
+    if (!results[2].error) {
+      renderNetwork(results[2]);
       health.textContent = 'Online';
       health.className = 'status online';
     } else {
       health.textContent = 'Node unavailable';
       health.className = 'status warning';
     }
-    renderWorkers(results[2]);
-    renderBlocks(results[3]);
-    renderPayouts(results[4]);
+    renderWorkers(results[3]);
+    renderBlocks(results[4]);
+    renderPayouts(results[5]);
     if (address) {
-      renderMiner(results[5]);
+      renderMiner(results[6]);
       byId('miner-panel').style.display = '';
     } else {
       byId('miner-panel').style.display = '';
@@ -269,5 +292,12 @@ if (initialFilter) {
   byId('miner-address').value = initialFilter;
 }
 
+function updateMissionClock() {
+  var now = new Date();
+  setText('mission-time', now.toISOString().slice(11, 19));
+}
+
+updateMissionClock();
+setInterval(updateMissionClock, 1000);
 refresh();
 setInterval(refresh, 15000);
