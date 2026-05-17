@@ -45,6 +45,12 @@ const options = {
     address: process.env.POOL_ADDRESS || fileConfig.miningaddress || "EcmFc6abS8xPkMpzWrZSo9yEU2jgcDhkzd",
     feeAddress: process.env.POOL_FEE_ADDRESS || "EWop2wCsufxboP19De9tY3hMaPKNUiUupL",
     payoutThreshold: parseNumber(process.env.PAYOUT_THRESHOLD, 100000),
+    payoutsEnabled: process.env.PAYOUTS_ENABLED === 'true',
+    payoutInterval: parseNumber(process.env.PAYOUT_INTERVAL_MS, 300000),
+    payoutMaturityConfirmations: parseNumber(process.env.PAYOUT_MATURITY_CONFIRMATIONS, 100),
+    payoutMinConfirmations: parseNumber(process.env.PAYOUT_MIN_CONFIRMATIONS, 100),
+    walletPassphrase: process.env.WALLET_PASSPHRASE || '',
+    walletUnlockSeconds: parseNumber(process.env.WALLET_UNLOCK_SECONDS, 60),
 
     // Reward recipients configuration
     rewardRecipients: {

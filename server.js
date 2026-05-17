@@ -13,6 +13,10 @@ function parseNumber(value, fallback) {
     return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function satsToEvr(amount) {
+    return Number((parseNumber(amount, 0) / 100000000).toFixed(8));
+}
+
 function applyNetworkMode(mode) {
     if (mode === 'testnet') {
         options.testnet = true;
@@ -126,6 +130,111 @@ class DaemonUtility {
     }
 }
 
+async function refreshTrackedBlockConfirmations() {
+    const blocks = stats.getBlocksNeedingConfirmation(options.payoutMaturityConfirmations);
+    for (const block of blocks) {
+        if (!block.hash || block.status === 'orphaned') {
+            continue;
+        }
+
+        try {
+            const blockData = await daemonCmd('getblock', [block.hash]);
+            const confirmations = parseNumber(blockData.confirmations, 0);
+            const status = confirmations < 0
+                ? 'orphaned'
+                : confirmations >= options.payoutMaturityConfirmations ? 'matured' : 'confirmed';
+            stats.updateBlockConfirmation(block.hash, confirmations, status);
+        } catch (error) {
+            console.warn(`Unable to refresh block confirmations for ${block.hash}: ${error.message || JSON.stringify(error)}`);
+        }
+    }
+}
+
+async function validatePayoutAddress(address) {
+    try {
+        const result = await daemonCmd('validateaddress', [address]);
+        return !!(result && result.isvalid);
+    } catch (error) {
+        console.warn(`Unable to validate payout address ${address}: ${error.message || JSON.stringify(error)}`);
+        return false;
+    }
+}
+
+async function unlockWalletIfConfigured() {
+    if (!options.walletPassphrase) {
+        return;
+    }
+
+    await daemonCmd('walletpassphrase', [options.walletPassphrase, options.walletUnlockSeconds]);
+}
+
+async function sendMaturePayouts(candidateSummary) {
+    const outputs = {};
+    const payableSummary = Object.assign({}, candidateSummary, { payouts: [], total: 0 });
+
+    for (const candidate of candidateSummary.payouts) {
+        if (!(await validatePayoutAddress(candidate.address))) {
+            console.warn(`Skipping payout for invalid address ${candidate.address}`);
+            continue;
+        }
+
+        outputs[candidate.address] = satsToEvr(candidate.amount);
+        payableSummary.payouts.push(candidate);
+        payableSummary.total += candidate.amount;
+    }
+
+    if (payableSummary.total <= 0) {
+        return null;
+    }
+
+    const walletBalance = parseNumber(await daemonCmd('getbalance', []), 0);
+    const payoutTotal = satsToEvr(payableSummary.total);
+    if (walletBalance + 0.00000001 < payoutTotal) {
+        console.warn(`Skipping payouts; wallet balance ${walletBalance} EVR is below payout total ${payoutTotal} EVR`);
+        return null;
+    }
+
+    await unlockWalletIfConfigured();
+    const txid = await daemonCmd('sendmany', [
+        '',
+        outputs,
+        options.payoutMinConfirmations,
+        'Manticore EVR pool payout'
+    ]);
+
+    return stats.markPayoutPaid(payableSummary, txid);
+}
+
+let payoutInProgress = false;
+async function processPayouts() {
+    if (payoutInProgress) {
+        return;
+    }
+
+    payoutInProgress = true;
+    try {
+        await refreshTrackedBlockConfirmations();
+
+        if (!options.payoutsEnabled) {
+            return;
+        }
+
+        const candidates = stats.getPayoutCandidates(options.payoutThreshold, options.payoutMaturityConfirmations);
+        if (candidates.total <= 0) {
+            return;
+        }
+
+        const payout = await sendMaturePayouts(candidates);
+        if (payout) {
+            console.log(`Paid ${satsToEvr(payout.total)} EVR to ${payout.outputs.length} address(es): ${payout.txid}`);
+        }
+    } catch (error) {
+        console.warn(`Payout processing failed: ${error.message || JSON.stringify(error)}`);
+    } finally {
+        payoutInProgress = false;
+    }
+}
+
 const pool = Stratum.createPool(options, function (ip, port, workerName, password, extraNonce1, version, callback) {
     console.log(`Authorize ${workerName} from ${ip}:${port}`);
     callback(stats.authorizeWorker(workerName, password));
@@ -190,6 +299,9 @@ app.get('/api/config', (req, res) => {
         poolAddress: options.address,
         poolFee: options.poolFee,
         payoutThreshold: options.payoutThreshold,
+        payoutsEnabled: options.payoutsEnabled,
+        payoutMaturityConfirmations: options.payoutMaturityConfirmations,
+        payoutInterval: options.payoutInterval,
         stratumPorts: Object.keys(options.ports),
         rpcHost: options.daemons[0].host,
         rpcPort: options.daemons[0].port,
@@ -247,6 +359,14 @@ app.get('/api/blocks', (req, res) => {
     res.json(stats.getRecentBlocks(parseNumber(req.query.limit, 25)));
 });
 
+app.get('/api/payouts', (req, res) => {
+    res.json(stats.getRecentPayouts(parseNumber(req.query.limit, 25)));
+});
+
+app.get('/api/payouts/candidates', (req, res) => {
+    res.json(stats.getPayoutCandidates(options.payoutThreshold, options.payoutMaturityConfirmations));
+});
+
 app.get('/netstats', async (req, res) => {
     try {
         const netstats = await DaemonUtility.getNetworkSnapshot();
@@ -299,6 +419,9 @@ async function start() {
     console.log(`Starting EVR pool in ${networkMode} mode`);
     console.log(`RPC daemon: ${options.daemons[0].host}:${options.daemons[0].port}`);
     console.log(`Pool address: ${options.address}`);
+    console.log(`Payouts enabled: ${options.payoutsEnabled ? 'yes' : 'no'} (threshold ${satsToEvr(options.payoutThreshold)} EVR, maturity ${options.payoutMaturityConfirmations} confirmations)`);
+    setInterval(processPayouts, options.payoutInterval);
+    setTimeout(processPayouts, 30000);
     pool.start(stats);
 }
 
