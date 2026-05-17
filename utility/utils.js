@@ -32,7 +32,57 @@ function getUserAndPassword(path) {
     };
 }
 
+function parseNumber(value, fallback) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function parseRpcEndpoint(endpoint) {
+    if (!endpoint) {
+        return {};
+    }
+
+    const raw = String(endpoint).trim();
+    if (!raw) {
+        return {};
+    }
+
+    try {
+        const parsed = new URL(raw.includes('://') ? raw : `http://${raw}`);
+        return {
+            host: parsed.hostname,
+            port: parsed.port ? Number(parsed.port) : undefined,
+            user: parsed.username ? decodeURIComponent(parsed.username) : undefined,
+            password: parsed.password ? decodeURIComponent(parsed.password) : undefined
+        };
+    } catch (error) {
+        return { host: raw };
+    }
+}
+
+function getRpcConfig(configPath, defaultPort) {
+    const fileConfig = parseConfigFile(configPath);
+    const endpoint = parseRpcEndpoint(process.env.EVR_RPC_URL || process.env.EVRMORE_RPC_URL);
+    const hostEndpoint = parseRpcEndpoint(process.env.EVR_RPC_HOST || process.env.EVRMORE_RPC_HOST);
+    const credentials = getUserAndPassword(configPath);
+
+    const host = endpoint.host || hostEndpoint.host || fileConfig.rpchost || '127.0.0.1';
+    const port = parseNumber(
+        process.env.EVR_RPC_PORT || process.env.EVRMORE_RPC_PORT || endpoint.port || hostEndpoint.port || fileConfig.rpcport,
+        defaultPort
+    );
+
+    return {
+        host,
+        port,
+        user: endpoint.user || credentials.user,
+        password: endpoint.password || credentials.password
+    };
+}
+
 module.exports = {
     getUserAndPassword,
-    parseConfigFile
+    parseConfigFile,
+    getRpcConfig,
+    parseRpcEndpoint
 };

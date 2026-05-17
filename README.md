@@ -146,10 +146,19 @@ For the pool build in this fork, the preferred launch command is:
 	npm install
 	EVRMORE_CONF=/mnt/evrmore/evrmore.conf POOL_ADDRESS=your-pool-payout-address npm start
 
+To use an Evrmore node running on another server, point the pool at that RPC endpoint:
+
+	EVR_RPC_URL=http://rpcuser:rpcpassword@203.0.113.10:8819 POOL_ADDRESS=your-pool-payout-address npm start
+
+Or set the remote node pieces separately:
+
+	EVR_RPC_HOST=203.0.113.10 EVR_RPC_PORT=8819 EVR_RPC_USER=rpcuser EVR_RPC_PASSWORD=rpcpassword POOL_ADDRESS=your-pool-payout-address npm start
+
 Useful environment variables:
 
 	EVRMORE_CONF=/path/to/evrmore.conf
-	EVR_RPC_HOST=127.0.0.1
+	EVR_RPC_URL=http://rpcuser:rpcpassword@203.0.113.10:8819
+	EVR_RPC_HOST=203.0.113.10
 	EVR_RPC_PORT=8819
 	EVR_RPC_USER=rpcuser-if-not-in-conf
 	EVR_RPC_PASSWORD=rpcpassword-if-not-in-conf
@@ -158,6 +167,14 @@ Useful environment variables:
 	POOL_FEE=0.01
 	API_PORT=3000
 	POOL_STATE_FILE=/path/to/pool-state.json
+
+On the remote Evrmore node, make sure `evrmore.conf` allows RPC from the pool server's IP. Example:
+
+	server=1
+	rpcbind=0.0.0.0
+	rpcallowip=<pool-server-public-or-private-ip>
+	rpcuser=<rpcuser>
+	rpcpassword=<rpcpassword>
 
 The JSON API and browser dashboard are served from the same process:
 

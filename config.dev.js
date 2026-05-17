@@ -1,4 +1,4 @@
-const { getUserAndPassword, parseConfigFile } = require('./utility/utils.js');
+const { getRpcConfig, parseConfigFile } = require('./utility/utils.js');
 
 const DEFAULT_CONF_PATHS = [
     process.env.EVRMORE_CONF,
@@ -25,7 +25,7 @@ function parseNumber(value, fallback) {
 
 const evrmore_config_path = firstExistingPath(DEFAULT_CONF_PATHS);
 const fileConfig = parseConfigFile(evrmore_config_path);
-const { user, password } = getUserAndPassword(evrmore_config_path);
+const rpcConfig = getRpcConfig(evrmore_config_path, 9821);
 
 // Define coin data
 const evrmore = {
@@ -97,10 +97,10 @@ const options = {
     // Daemon configuration
     daemons: [
         {
-            host: process.env.EVR_RPC_HOST || '127.0.0.1',
-            port: parseNumber(process.env.EVR_RPC_PORT || fileConfig.rpcport, 9821),
-            user: user,
-            password: password
+            host: rpcConfig.host,
+            port: rpcConfig.port,
+            user: rpcConfig.user,
+            password: rpcConfig.password
         }
     ],
 
