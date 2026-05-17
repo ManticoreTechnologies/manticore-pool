@@ -26,22 +26,25 @@
   "bugs": {
     "url": "https://github.com/hans-schmidt/kawpow_personal_stratum_server/issues"
   },
-  "bundleDependencies": [],
   "contributors": [
     {
       "name": "Hans Schmidt"
     }
   ],
   "dependencies": {
+    "async": "^3.2.6",
     "cors": "^2.8.5",
-    "logger": "0.0.1",
-    "pg": "^7.18.2",
-    "sqlite3": "^4.2.0"
+    "express": "^4.21.2",
+    "merkle-bitcoin": "^1.0.2",
+    "pg": "^8.20.0",
+    "promise": "^8.3.0",
+    "sequelize": "^6.37.5",
+    "sha3": "^2.1.4"
   },
   "deprecated": false,
   "description": "High performance personal Stratum server in Node.js",
   "engines": {
-    "node": ">=7"
+    "node": ">=12"
   },
   "homepage": "https://github.com/hans-schmidt/kawpow_personal_stratum_server",
   "keywords": [
@@ -63,16 +66,9 @@
     "url": "git+https://github.com/hans-schmidt/kawpow_personal_stratum_server.git"
   },
   "version": "0.1.0",
-  "devDependencies": {
-    "async": "^3.2.6",
-    "base58-native": "^0.1.4",
-    "big-integer": "^1.6.52",
-    "bignum": "^0.13.1",
-    "bitcoinjs-lib": "^5.2.0",
-    "express": "^4.21.2",
-    "merkle-bitcoin": "^1.0.2",
-    "promise": "^8.3.0",
-    "sequelize": "^6.37.5",
-    "sha3": "^2.1.4"
+  "scripts": {
+    "start": "node server.js mainnet",
+    "start:testnet": "node server.js testnet",
+    "check": "node --check server.js && node --check config.js && node --check lib/poolStatsStore.js && node --check lib/bignumCompat.js && node --check lib/base58.js && node --check lib/transactions.js && node --check lib/jobManager.js && node --check lib/stratum.js"
   }
 }

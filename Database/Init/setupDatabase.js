@@ -1,5 +1,4 @@
 // Import the CockroachDB module
-const { jacobi } = require('bignum');
 const CockroachDB = require('../CockroachDB/cockroachdb.js');
 
 const { table_schemas, tableCreationOrder } = require('../Schema/index.js');

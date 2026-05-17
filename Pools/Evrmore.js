@@ -12,6 +12,21 @@ class EvrmorePool extends Pool {
 
         // Create the autorize function
         const authorizationFunction = async function(ip, port, workerName, password, extraNonce1, version, callback){
+            const authorize = function(){
+                callback({
+                    error: null,
+                    authorized: true,
+                    disconnect: false
+                });
+            };
+
+            const reject = function(message){
+                callback({
+                    error: [20, message, null],
+                    authorized: false,
+                    disconnect: false
+                });
+            };
             
             // Try get the worker from the database
             const worker = await database.getWorker(workerName);
@@ -34,7 +49,7 @@ class EvrmorePool extends Pool {
                 database.incrementPoolStats(['total_workers'], [1]);
                 // Authorize the worker
                 console.log("Authorized new worker");
-                callback(true);
+                authorize();
             }else{      
                 // Get the worker password
                 const worker_password = worker.worker_password;
@@ -42,10 +57,10 @@ class EvrmorePool extends Pool {
                 // Check if the password is correct
                 if (password === worker_password){
                     console.log("Authorized worker");
-                    callback(true);
+                    authorize();
                 } else {
                     console.log("Unauthorized worker");
-                    callback(false);
+                    reject('invalid worker password');
                 }
             }
         };

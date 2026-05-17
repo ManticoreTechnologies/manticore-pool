@@ -14,7 +14,7 @@ class Pool {
 
     // Start the pool
     start(){
-        this._pool.start();
+        this._pool.start(this.database);
     }
 }
 
