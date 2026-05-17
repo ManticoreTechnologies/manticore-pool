@@ -165,6 +165,7 @@ Useful environment variables:
 	POOL_ADDRESS=pool-block-reward-address
 	POOL_FEE_ADDRESS=pool-fee-address
 	POOL_FEE=0.01
+	API_HOST=0.0.0.0
 	API_PORT=3000
 	POOL_STATE_FILE=/path/to/pool-state.json
 
@@ -183,6 +184,11 @@ The JSON API and browser dashboard are served from the same process:
 	http://your-pool-host:3000/api/poolstats
 	http://your-pool-host:3000/api/workers
 	http://your-pool-host:3000/api/netstats
+
+For a public VPS dashboard, keep `API_HOST=0.0.0.0` and allow TCP `API_PORT`
+through both the OS firewall and the VPS/cloud provider firewall or security group.
+On AWS EC2, this means adding an inbound security-group rule for TCP 3000 from
+your IP or `0.0.0.0/0` if you intentionally want it public.
 
 Miners connect to the stratum ports configured in `config.js` (3333 and 3334 by default):
 

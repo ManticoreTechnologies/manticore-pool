@@ -167,6 +167,7 @@ pool.on('log', function (severity, logKey, logText) {
 
 const app = express();
 const apiPort = parseNumber(process.env.API_PORT, 3000);
+const apiHost = process.env.API_HOST || process.env.API_BIND_ADDRESS || process.env.DASHBOARD_HOST || '0.0.0.0';
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
@@ -284,8 +285,14 @@ app.get('*', (req, res) => {
 });
 
 async function start() {
-    app.listen(apiPort, () => {
-        console.log(`Pool API and dashboard listening on port ${apiPort}`);
+    const apiServer = app.listen(apiPort, apiHost, () => {
+        console.log(`Pool API and dashboard listening on http://${apiHost}:${apiPort}`);
+        console.log(`If this is a VPS/cloud server, open TCP ${apiPort} to this instance in the provider firewall/security group.`);
+    });
+
+    apiServer.on('error', (error) => {
+        console.error(`Pool API failed to listen on ${apiHost}:${apiPort}: ${error.message}`);
+        process.exit(1);
     });
 
     console.log(`Starting EVR pool in ${networkMode} mode`);
