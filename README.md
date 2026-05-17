@@ -193,6 +193,10 @@ MRR and several Evrprogpow miners do not reserve nonce ranges using the stratum
 extranonce, so `ENFORCE_NONCE_PREFIX` defaults to `false`. Turn it on only if
 all connected miners are known to honor the assigned nonce prefix.
 
+EVRPROGPOW uses a 12000-block epoch for seed/DAG generation. If every share is
+rejected as `bad share: invalid hash`, check that miners restarted after the
+pool updated jobs and are not using stale work from before this seed setting.
+
 The JSON API and browser dashboard are served from the same process:
 
 	http://your-pool-host:3000/
