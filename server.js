@@ -36,7 +36,7 @@ if (networkMode !== 'mainnet' && networkMode !== 'testnet') {
 applyNetworkMode(networkMode);
 
 if (!options.daemons[0].user || !options.daemons[0].password) {
-    console.warn('EVR RPC credentials were not found. Set EVRMORE_CONF, EVR_RPC_USER, and EVR_RPC_PASSWORD before starting against a node.');
+    console.warn('EVR RPC credentials were not found. Set EVR_RPC_URL, EVRMORE_CONF, or EVR_RPC_USER/EVR_RPC_PASSWORD before starting against a node.');
 }
 
 const stats = new PoolStatsStore(process.env.POOL_STATE_FILE || path.join(__dirname, 'data', 'pool-state.json'), options);
