@@ -17,6 +17,11 @@
   </header>
 
   <main>
+    <nav class="tabs">
+      <a href="/" id="home-link">Pool Home</a>
+      <a href="#" id="miner-link">Miner Dashboard</a>
+    </nav>
+
     <section class="grid cards">
       <article>
         <span>Pool Hashrate</span>
@@ -34,6 +39,11 @@
         <span>Valid / Invalid Shares</span>
         <strong><span id="valid-shares">0</span> / <span id="invalid-shares">0</span></strong>
       </article>
+      <article>
+        <span>Unpaid / Paid</span>
+        <strong><span id="pool-unpaid">0 EVR</span></strong>
+        <small id="pool-paid">0 EVR paid</small>
+      </article>
     </section>
 
     <section class="panel">
@@ -50,6 +60,37 @@
         <div><span>Network Hashrate</span><strong id="net-hashrate">-</strong></div>
         <div><span>Pool Network Share</span><strong id="network-share">-</strong></div>
       </div>
+    </section>
+
+    <section class="panel" id="miner-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Miner Dashboard</h2>
+          <p class="muted">View workers, payout balance, manual payout, and automatic payout settings.</p>
+        </div>
+        <input id="miner-address" placeholder="Enter EVR payout address">
+      </div>
+
+      <div class="grid stats">
+        <div><span>Address</span><strong id="miner-address-label">-</strong></div>
+        <div><span>Miner Hashrate</span><strong id="miner-hashrate">0 H/s</strong></div>
+        <div><span>Unpaid Balance</span><strong id="miner-unpaid">0 EVR</strong></div>
+        <div><span>Eligible Mature Payout</span><strong id="miner-eligible">0 EVR</strong></div>
+      </div>
+
+      <div class="settings-grid">
+        <label class="toggle">
+          <input type="checkbox" id="auto-payout">
+          <span>Enable automatic payouts for this address</span>
+        </label>
+        <label>
+          Payout threshold (EVR)
+          <input id="payout-threshold" type="number" min="0" step="0.00000001">
+        </label>
+        <button id="save-payout-settings">Save payout settings</button>
+        <button id="manual-payout">Manual payout now</button>
+      </div>
+      <p class="muted" id="payout-message"></p>
     </section>
 
     <section class="panel">
@@ -86,6 +127,16 @@
         </div>
       </div>
       <div id="blocks" class="list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Recent Payouts</h2>
+          <p class="muted">Wallet transactions sent by the pool payout worker.</p>
+        </div>
+      </div>
+      <div id="payouts" class="list"></div>
     </section>
   </main>
 

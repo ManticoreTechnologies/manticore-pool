@@ -83,13 +83,32 @@ h2 {
   color: var(--warn);
 }
 
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.tabs a {
+  background: rgba(18, 26, 46, 0.78);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  padding: 10px 14px;
+  text-decoration: none;
+}
+
+.tabs a:hover {
+  border-color: var(--accent);
+}
+
 .grid {
   display: grid;
   gap: 16px;
 }
 
 .cards {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
@@ -115,6 +134,12 @@ h2 {
 
 .cards strong {
   font-size: 1.5rem;
+}
+
+.cards small {
+  color: var(--muted);
+  display: block;
+  margin-top: 6px;
 }
 
 .panel {
@@ -161,6 +186,36 @@ button:hover {
 
 input {
   min-width: min(360px, 100%);
+}
+
+.settings-grid {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(180px, 1fr) auto auto;
+  margin-top: 18px;
+}
+
+.settings-grid label {
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+}
+
+.settings-grid .toggle {
+  align-items: center;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--text);
+  display: flex;
+  min-height: 43px;
+  padding: 10px 13px;
+}
+
+.toggle input {
+  min-width: auto;
+  width: auto;
 }
 
 .table-wrap {
@@ -227,6 +282,10 @@ td small {
   .cards,
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr;
   }
 }
 

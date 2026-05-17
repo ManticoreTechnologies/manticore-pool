@@ -178,6 +178,7 @@ Useful environment variables:
 	PAYOUT_MATURITY_CONFIRMATIONS=100
 	PAYOUT_MIN_CONFIRMATIONS=100
 	PAYOUT_INTERVAL_MS=300000
+	PAYOUT_ADMIN_TOKEN=optional-dashboard-token
 	WALLET_PASSPHRASE=optional-wallet-passphrase
 	POOL_STATE_FILE=/path/to/pool-state.json
 
@@ -224,6 +225,10 @@ The Evrmore RPC node must have wallet RPC enabled, must control spendable mature
 coinbase funds for `POOL_ADDRESS`, and must be unlocked or have
 `WALLET_PASSPHRASE` configured. Keep backups of `POOL_STATE_FILE`; it is the
 source of truth for unpaid and paid accounting.
+
+The public dashboard can show miner stats without authentication. If
+`PAYOUT_ADMIN_TOKEN` is set, manual payouts and payout preference changes require
+that token. The browser will prompt for it and store it locally.
 
 The JSON API and browser dashboard are served from the same process:
 

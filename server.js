@@ -17,6 +17,20 @@ function satsToEvr(amount) {
     return Number((parseNumber(amount, 0) / 100000000).toFixed(8));
 }
 
+function requirePayoutAdmin(req, res) {
+    if (!options.payoutAdminToken) {
+        return true;
+    }
+
+    const token = req.get('x-payout-admin-token') || req.body.payoutAdminToken || '';
+    if (token === options.payoutAdminToken) {
+        return true;
+    }
+
+    res.status(401).json({ error: 'Payout admin token required' });
+    return false;
+}
+
 function applyNetworkMode(mode) {
     if (mode === 'testnet') {
         options.testnet = true;
@@ -206,6 +220,39 @@ async function sendMaturePayouts(candidateSummary) {
 }
 
 let payoutInProgress = false;
+async function processAddressPayout(address) {
+    if (payoutInProgress) {
+        throw new Error('Payout processing is already running');
+    }
+
+    payoutInProgress = true;
+    try {
+        await refreshTrackedBlockConfirmations();
+        const preferences = stats.ensureAddress(address);
+        const candidates = stats.getPayoutCandidates(
+            preferences.payoutThreshold,
+            options.payoutMaturityConfirmations,
+            { address }
+        );
+        if (candidates.total <= 0) {
+            return {
+                paid: false,
+                reason: 'No mature balance at or above payout threshold',
+                candidates
+            };
+        }
+
+        const payout = await sendMaturePayouts(candidates);
+        return {
+            paid: !!payout,
+            payout,
+            candidates
+        };
+    } finally {
+        payoutInProgress = false;
+    }
+}
+
 async function processPayouts() {
     if (payoutInProgress) {
         return;
@@ -219,7 +266,11 @@ async function processPayouts() {
             return;
         }
 
-        const candidates = stats.getPayoutCandidates(options.payoutThreshold, options.payoutMaturityConfirmations);
+        const candidates = stats.getPayoutCandidates(
+            options.payoutThreshold,
+            options.payoutMaturityConfirmations,
+            { autoOnly: true }
+        );
         if (candidates.total <= 0) {
             return;
         }
@@ -300,6 +351,7 @@ app.get('/api/config', (req, res) => {
         poolFee: options.poolFee,
         payoutThreshold: options.payoutThreshold,
         payoutsEnabled: options.payoutsEnabled,
+        payoutAdminTokenRequired: !!options.payoutAdminToken,
         payoutMaturityConfirmations: options.payoutMaturityConfirmations,
         payoutInterval: options.payoutInterval,
         stratumPorts: Object.keys(options.ports),
@@ -327,6 +379,37 @@ app.get('/api/workers/:address', (req, res) => {
     res.json(stats.getWorkersByAddress(req.params.address));
 });
 
+app.get('/api/miner/:address', (req, res) => {
+    res.json(stats.getAddressSummary(req.params.address, options.payoutMaturityConfirmations));
+});
+
+app.put('/api/miner/:address/payout-settings', (req, res) => {
+    if (!requirePayoutAdmin(req, res)) {
+        return;
+    }
+    const preferences = stats.setAddressPayoutPreferences(req.params.address, {
+        autoPayout: req.body.autoPayout,
+        payoutThreshold: req.body.payoutThreshold
+    });
+    res.json(preferences);
+});
+
+app.post('/api/miner/:address/payout', async (req, res) => {
+    if (!requirePayoutAdmin(req, res)) {
+        return;
+    }
+    try {
+        const result = await processAddressPayout(req.params.address);
+        if (!result.paid) {
+            res.status(409).json(result);
+            return;
+        }
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message || String(error) });
+    }
+});
+
 app.get('/dashboard/:address', (req, res) => {
     if (req.accepts('html')) {
         res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -336,19 +419,7 @@ app.get('/dashboard/:address', (req, res) => {
 });
 
 app.get('/api/dashboard/:address', (req, res) => {
-    const workers = stats.getWorkersByAddress(req.params.address);
-    res.json({
-        address: req.params.address,
-        workers,
-        totals: workers.reduce((totals, worker) => {
-            totals.hashrate += parseNumber(worker.hashrate, 0);
-            totals.valid += parseNumber(worker.valid, 0);
-            totals.invalid += parseNumber(worker.invalid, 0);
-            totals.unpaid += parseNumber(worker.unpaid, 0);
-            totals.blocks += parseNumber(worker.blocks, 0);
-            return totals;
-        }, { hashrate: 0, valid: 0, invalid: 0, unpaid: 0, blocks: 0 })
-    });
+    res.json(stats.getAddressSummary(req.params.address, options.payoutMaturityConfirmations));
 });
 
 app.get('/api/shares', (req, res) => {

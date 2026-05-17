@@ -51,6 +51,7 @@ const options = {
     payoutMinConfirmations: parseNumber(process.env.PAYOUT_MIN_CONFIRMATIONS, 100),
     walletPassphrase: process.env.WALLET_PASSPHRASE || '',
     walletUnlockSeconds: parseNumber(process.env.WALLET_UNLOCK_SECONDS, 60),
+    payoutAdminToken: process.env.PAYOUT_ADMIN_TOKEN || '',
 
     // Reward recipients configuration
     rewardRecipients: {
