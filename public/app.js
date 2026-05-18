@@ -65,20 +65,60 @@ function connectHostDefault() {
   return window.location.hostname || 'your-pool-host';
 }
 
+function getAuthToken() {
+  return window.localStorage.getItem('authToken') || '';
+}
+
+function getAuthAddress() {
+  return window.localStorage.getItem('authAddress') || '';
+}
+
+function setAuth(token, address) {
+  window.localStorage.setItem('authToken', token);
+  window.localStorage.setItem('authAddress', address);
+}
+
+function clearAuth() {
+  window.localStorage.removeItem('authToken');
+  window.localStorage.removeItem('authAddress');
+}
+
+function isLoggedIn() {
+  return !!getAuthToken() && !!getAuthAddress();
+}
+
+function authHeaders() {
+  var headers = {};
+  var token = getAuthToken();
+  if (token) {
+    headers['authorization'] = 'Bearer ' + token;
+  }
+  return headers;
+}
+
 async function getJson(url) {
-  var response = await fetch(url);
+  var response = await fetch(url, { headers: authHeaders() });
   if (!response.ok) {
     throw new Error(await response.text());
   }
   return response.json();
 }
 
-async function sendJson(url, method, body) {
-  var headers = { 'content-type': 'application/json' };
-  var token = window.localStorage.getItem('payoutAdminToken');
-  if (token) {
-    headers['x-payout-admin-token'] = token;
+async function getJsonAuth(url) {
+  var token = getAuthToken();
+  if (!token) return null;
+  var response = await fetch(url, { headers: authHeaders() });
+  if (response.status === 401) {
+    clearAuth();
+    updateAuthUI();
+    return null;
   }
+  if (!response.ok) return null;
+  return response.json();
+}
+
+async function sendJson(url, method, body) {
+  var headers = Object.assign({ 'content-type': 'application/json' }, authHeaders());
   var response = await fetch(url, {
     method: method,
     headers: headers,
@@ -87,15 +127,54 @@ async function sendJson(url, method, body) {
   var data = await response.json().catch(function() { return {}; });
   if (!response.ok) {
     if (response.status === 401) {
-      var newToken = window.prompt('Enter payout admin token');
-      if (newToken) {
-        window.localStorage.setItem('payoutAdminToken', newToken);
-        return sendJson(url, method, body);
-      }
+      clearAuth();
+      updateAuthUI();
     }
     throw new Error(data.reason || data.error || JSON.stringify(data));
   }
   return data;
+}
+
+async function doLogin(address, password) {
+  var response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ address: address, password: password })
+  });
+  var data = await response.json().catch(function() { return {}; });
+  if (!response.ok) {
+    throw new Error(data.error || 'Login failed');
+  }
+  setAuth(data.token, data.address);
+  return data;
+}
+
+async function doLogout() {
+  try {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: authHeaders()
+    });
+  } catch (e) { /* ignore */ }
+  clearAuth();
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  var loginSections = document.querySelectorAll('.auth-login-section');
+  var authSections = document.querySelectorAll('.auth-protected');
+  var loggedIn = isLoggedIn();
+  Array.prototype.forEach.call(loginSections, function(el) {
+    el.style.display = loggedIn ? 'none' : '';
+  });
+  Array.prototype.forEach.call(authSections, function(el) {
+    el.style.display = loggedIn ? '' : 'none';
+  });
+  var addrLabels = document.querySelectorAll('.auth-address-label');
+  var addr = getAuthAddress();
+  Array.prototype.forEach.call(addrLabels, function(el) {
+    el.textContent = addr ? shortAddress(addr) : '';
+  });
 }
 
 function renderPool(pool) {
@@ -222,9 +301,292 @@ function renderMiner(summary) {
   }
 }
 
+var warfield = null;
+var lastWarsState = null;
+var liveFeed = [];
+var sseSource = null;
+var shareCounter = { value: 0, target: 0, lastUpdate: 0 };
+
+function connectSSE() {
+  if (sseSource) return;
+  if (!byId('war-canvas') && !byId('wars-event-name')) return;
+  try {
+    sseSource = new EventSource('/api/events');
+    sseSource.addEventListener('share', function(e) {
+      var data = JSON.parse(e.data);
+      handleLiveShare(data);
+    });
+    sseSource.addEventListener('block', function(e) {
+      var data = JSON.parse(e.data);
+      handleLiveBlock(data);
+    });
+    sseSource.addEventListener('worker_update', function(e) {
+      var data = JSON.parse(e.data);
+      handleWorkerUpdate(data);
+    });
+    sseSource.onerror = function() {
+      sseSource.close();
+      sseSource = null;
+      setTimeout(connectSSE, 5000);
+    };
+  } catch (ex) { /* SSE not supported */ }
+}
+
+function handleLiveShare(data) {
+  if (warfield && data.valid) {
+    warfield.injectShare(data);
+  }
+  shareCounter.target++;
+  var feedEntry = {
+    timestamp: data.timestamp || Date.now(),
+    type: data.block ? 'block' : data.valid ? 'share' : 'reject',
+    message: (data.callsign || data.worker.split('.').pop()) + (data.valid ? ' +share → ' + (data.territory || '?') : ' ✗ rejected'),
+    faction: data.faction
+  };
+  liveFeed.unshift(feedEntry);
+  liveFeed = liveFeed.slice(0, 30);
+  renderLiveFeed();
+}
+
+function handleLiveBlock(data) {
+  if (warfield) warfield.injectBlock(data);
+  var feedEntry = {
+    timestamp: data.timestamp || Date.now(),
+    type: 'block',
+    message: '⚡ BLOCK FOUND by ' + (data.callsign || data.finder) + ' — faction shockwave emitted',
+    faction: data.faction
+  };
+  liveFeed.unshift(feedEntry);
+  liveFeed = liveFeed.slice(0, 30);
+  renderLiveFeed();
+  showBigMoment('BLOCK DETECTED', data.faction);
+}
+
+function handleWorkerUpdate(data) {
+  if (warfield && lastWarsState) {
+    var unit = (lastWarsState.mapUnits || []).find(function(u) { return u.workername === data.worker; });
+    if (unit) unit.hashrate = data.hashrate;
+  }
+}
+
+function renderLiveFeed() {
+  var container = byId('war-live-feed');
+  if (!container) return;
+  container.innerHTML = liveFeed.slice(0, 8).map(function(entry) {
+    var time = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    var cls = entry.type === 'block' ? 'feed-block' : entry.type === 'reject' ? 'feed-reject' : 'feed-share';
+    return '<div class="feed-line ' + cls + '"><span class="feed-time">' + time + '</span> ' + escapeHtml(entry.message) + '</div>';
+  }).join('');
+}
+
+function showBigMoment(text, faction) {
+  var overlay = byId('war-big-moment');
+  if (!overlay) return;
+  overlay.textContent = text;
+  overlay.className = 'war-big-moment active';
+  overlay.setAttribute('data-faction', faction || '');
+  setTimeout(function() { overlay.className = 'war-big-moment'; }, 3500);
+}
+
+function interpolateCounter(id) {
+  var el = byId(id);
+  if (!el || !el._target) return;
+  var current = el._current || 0;
+  var target = el._target;
+  var diff = target - current;
+  if (Math.abs(diff) < 1) { el._current = target; return; }
+  el._current = current + diff * 0.1;
+  el.textContent = Math.round(el._current).toLocaleString();
+}
+
+function setAnimatedText(id, value) {
+  var el = byId(id);
+  if (!el) return;
+  var num = Number(value);
+  if (Number.isFinite(num) && num > 10) {
+    el._target = num;
+    if (!el._current) el._current = num;
+  } else {
+    el.textContent = value;
+  }
+}
+
+function initWarfield() {
+  if (warfield) return;
+  var canvas = byId('war-canvas');
+  if (!canvas || typeof Warfield === 'undefined') return;
+  warfield = new Warfield(canvas);
+  warfield.onSectorSelect = function(sector) {
+    if (lastWarsState) renderSectorDetail(sector, lastWarsState);
+  };
+  warfield.start();
+}
+
+function renderHashWars(state) {
+  if (!byId('wars-event-name')) return;
+  lastWarsState = state;
+
+  initWarfield();
+  connectSSE();
+  if (warfield) warfield.updateState(state);
+
+  setText('wars-event-name', state.event.name);
+  setText('wars-event-progress', state.event.progress + '%');
+  if (byId('wars-event-bar')) {
+    byId('wars-event-bar').style.width = state.event.progress + '%';
+  }
+  setAnimatedText('wars-units', state.totals.units);
+  setAnimatedText('wars-active-units', state.totals.activeUnits);
+  setText('wars-hashrate', formatHashrate(state.totals.hashrate));
+  setAnimatedText('wars-energy', Math.round(state.totals.pressure || state.totals.energy));
+
+  renderWarFactionBar(state);
+  renderWarUnits(state);
+  renderWarsCommand(state);
+  renderWarsBattleLog(state.battleLog || []);
+  renderWarNetworkAlerts(state.networkEvents || []);
+}
+
+function renderWarFactionBar(state) {
+  var bar = byId('war-faction-bar');
+  if (!bar) return;
+  bar.innerHTML = state.factions.map(function(faction) {
+    return '<div class="war-faction-strip" style="--fc:' + escapeHtml(faction.color) + '">' +
+      '<span class="war-faction-name">' + escapeHtml(faction.name) + '</span>' +
+      '<span class="war-faction-inf">' + faction.influence + '%</span>' +
+      '<div class="war-faction-meter"><div class="war-faction-meter-fill" style="width:' + faction.influence + '%"></div></div>' +
+      '<span class="war-faction-terr">' + (faction.territoriesOwned || 0) + ' sectors / ' + faction.activeUnits + ' active</span>' +
+      '</div>';
+  }).join('');
+}
+
+function renderSectorDetail(sector, state) {
+  var container = byId('wars-sector-detail');
+  if (!container || !sector) return;
+  state = state || lastWarsState;
+  var factions = (state && state.constants && state.constants.factions) || [];
+  var controlMap = sector.controlMap || {};
+  var barsHtml = factions.map(function(f) {
+    var val = controlMap[f.id] || 0;
+    return '<div class="war-intel-bar">' +
+      '<span class="war-intel-bar-label" style="color:' + escapeHtml(f.color) + '">' + escapeHtml(f.name.slice(0, 3)) + '</span>' +
+      '<div class="war-intel-bar-track"><div class="war-intel-bar-fill" style="width:' + val + '%;background:' + escapeHtml(f.color) + '"></div></div>' +
+      '<span class="war-intel-bar-val">' + val + '%</span>' +
+      '</div>';
+  }).join('');
+
+  var sectorFacilities = state && state.map && state.map.facilities
+    ? state.map.facilities.filter(function(f) { return f.sectorId === sector.id; })
+    : [];
+  var facText = sectorFacilities.map(function(f) { return f.name; }).join(', ') || 'None';
+
+  container.innerHTML = '<div class="war-intel-card">' +
+    '<div class="war-intel-name">' + escapeHtml(sector.name) + '</div>' +
+    '<div class="war-intel-owner" style="color:' + escapeHtml(sector.ownerColor) + '">' +
+      escapeHtml(sector.ownerName) + ' control &mdash; ' + escapeHtml(sector.status) +
+    '</div>' +
+    '<div class="war-intel-bars">' + barsHtml + '</div>' +
+    '<div class="war-intel-meta">Momentum: ' + (sector.momentum || 0) + '% | ' + escapeHtml(sector.anomaly || 'stable') +
+    ' | ' + escapeHtml(sector.buff || '') + '<br>Facilities: ' + escapeHtml(facText) + '</div>' +
+    '</div>';
+}
+
+function renderWarUnits(state) {
+  var container = byId('wars-units-list');
+  if (!container) return;
+  var units = state.units || [];
+  if (!units.length) {
+    container.innerHTML = '<p class="war-muted">No units enlisted. Connect a miner.</p>';
+    return;
+  }
+  container.innerHTML = units.slice(0, 12).map(function(unit) {
+    var fc = state.factions.find(function(f) { return f.id === unit.faction; });
+    var color = fc ? fc.color : '#ff9d2e';
+    return '<div class="war-unit-chip ' + (unit.active ? 'active' : '') + '">' +
+      '<div class="war-unit-icon" style="border-color:' + escapeHtml(color) + '">' +
+        escapeHtml(unit.callsign.slice(0, 2).toUpperCase()) +
+      '</div>' +
+      '<div class="war-unit-info">' +
+        '<div class="war-unit-callsign">' + escapeHtml(unit.callsign) + '</div>' +
+        '<div class="war-unit-meta">L' + unit.level + ' ' + escapeHtml(unit.className) + ' / ' + escapeHtml(unit.archetype) + ' / ' + escapeHtml(unit.stance) + '</div>' +
+      '</div>' +
+      '<div class="war-unit-stats-mini">' +
+        '<div><span>ATK</span><strong>' + unit.attack + '</strong></div>' +
+        '<div><span>SHD</span><strong>' + unit.shield + '</strong></div>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function renderWarsCommand(state) {
+  if (!byId('wars-command-worker')) return;
+
+  var selected = byId('wars-command-worker').value;
+  byId('wars-command-worker').innerHTML = state.units.map(function(unit) {
+    return '<option value="' + escapeHtml(unit.workername) + '">' + escapeHtml(unit.callsign) + ' (' + escapeHtml(unit.className) + ')</option>';
+  }).join('');
+  if (selected) byId('wars-command-worker').value = selected;
+
+  byId('wars-command-faction').innerHTML = state.constants.factions.map(function(faction) {
+    return '<option value="' + escapeHtml(faction.id) + '">' + escapeHtml(faction.name) + '</option>';
+  }).join('');
+  byId('wars-command-territory').innerHTML = state.constants.territories.map(function(territory) {
+    return '<option value="' + escapeHtml(territory) + '">' + escapeHtml(territory) + '</option>';
+  }).join('');
+  byId('wars-command-stance').innerHTML = state.constants.stances.map(function(stance) {
+    return '<option value="' + escapeHtml(stance.id) + '">' + escapeHtml(stance.name) + '</option>';
+  }).join('');
+
+  var unit = state.units.find(function(item) { return item.workername === byId('wars-command-worker').value; }) || state.units[0];
+  if (unit) {
+    byId('wars-command-worker').value = unit.workername;
+    byId('wars-command-callsign').value = unit.callsign;
+    byId('wars-command-faction').value = unit.faction;
+    byId('wars-command-territory').value = unit.territory;
+    byId('wars-command-stance').value = unit.stance;
+  }
+}
+
+function renderWarsBattleLog(log) {
+  var container = byId('wars-battle-log');
+  if (!container) return;
+  if (!log.length) {
+    container.innerHTML = '<p class="war-muted">No war events yet. Keep hashing.</p>';
+    return;
+  }
+  container.innerHTML = log.slice(0, 10).map(function(entry) {
+    return '<div class="war-log-entry" data-type="' + escapeHtml(entry.type) + '">' +
+      '<strong>' + escapeHtml(entry.type.replace(/_/g, ' ')) + '</strong>' +
+      '<span>' + escapeHtml(entry.message) + '</span>' +
+      '<small>' + new Date(entry.timestamp).toLocaleTimeString() + '</small>' +
+      '</div>';
+  }).join('');
+}
+
+function renderWarNetworkAlerts(events) {
+  var container = byId('war-network-alert');
+  if (!container) return;
+  if (!events || !events.length) {
+    container.innerHTML = '';
+    return;
+  }
+  var evt = events[0];
+  var severity = evt.type === 'difficulty_spike' ? 'high'
+    : evt.type === 'block_found' ? 'low'
+    : 'medium';
+  container.innerHTML = '<div class="war-alert-pill" data-severity="' + severity + '">' +
+    escapeHtml(evt.message) + '</div>';
+}
+
 async function refresh() {
   var health = byId('health');
+  var isWarsPage = !!byId('war-canvas');
   try {
+    if (isWarsPage) {
+      var warsData = await getJson('/api/hash-wars');
+      renderHashWars(warsData);
+      return;
+    }
     var address = currentAddressFilter();
     var workersUrl = address ? '/api/workers/' + encodeURIComponent(address) : '/api/workers';
     var requests = [
@@ -238,17 +600,18 @@ async function refresh() {
     if (address) {
       requests.push(getJson('/api/miner/' + encodeURIComponent(address)));
     }
+    if (byId('wars-event-name') && !isWarsPage) {
+      requests.push(getJson('/api/hash-wars'));
+    }
     var results = await Promise.all(requests);
 
     renderConfig(results[0]);
     renderPool(results[1]);
     if (!results[2].error) {
       renderNetwork(results[2]);
-      health.textContent = 'Online';
-      health.className = 'status online';
+      if (health) { health.textContent = 'Online'; health.className = 'status online'; }
     } else {
-      health.textContent = 'Node unavailable';
-      health.className = 'status warning';
+      if (health) { health.textContent = 'Node unavailable'; health.className = 'status warning'; }
     }
     renderWorkers(results[3]);
     renderBlocks(results[4]);
@@ -260,9 +623,11 @@ async function refresh() {
       if (byId('miner-panel')) byId('miner-panel').style.display = '';
       renderMiner({ address: '', totals: {}, preferences: { payoutThreshold: results[0].payoutThreshold || 0 }, payoutCandidates: { total: 0 } });
     }
+    if (byId('wars-event-name') && !isWarsPage) {
+      renderHashWars(results[results.length - 1]);
+    }
   } catch (error) {
-    health.textContent = 'Dashboard error';
-    health.className = 'status warning';
+    if (health) { health.textContent = 'Dashboard error'; health.className = 'status warning'; }
     console.error(error);
   }
 }
@@ -426,6 +791,159 @@ Array.prototype.forEach.call(document.querySelectorAll('.copy-button'), function
     }
   });
 });
+if (byId('wars-command-worker')) {
+  byId('wars-command-worker').addEventListener('change', refresh);
+}
+if (byId('wars-command-save')) {
+  byId('wars-command-save').addEventListener('click', async function() {
+    var worker = byId('wars-command-worker').value;
+    if (!worker) {
+      setText('wars-command-message', 'No worker selected. Connect a miner first.');
+      return;
+    }
+    try {
+      await sendJson('/api/hash-wars/worker/' + encodeURIComponent(worker), 'PUT', {
+        callsign: byId('wars-command-callsign').value,
+        faction: byId('wars-command-faction').value,
+        territory: byId('wars-command-territory').value,
+        stance: byId('wars-command-stance').value
+      });
+      setText('wars-command-message', 'Deployed. Pressure applies next tick.');
+      refresh();
+    } catch (error) {
+      setText('wars-command-message', 'Deploy failed: ' + error.message);
+    }
+  });
+}
+if (byId('war-toggle-sidebar')) {
+  byId('war-toggle-sidebar').addEventListener('click', function() {
+    var sb = byId('war-sidebar');
+    if (sb) sb.classList.toggle('collapsed');
+  });
+}
+if (byId('war-close-sidebar')) {
+  byId('war-close-sidebar').addEventListener('click', function() {
+    var sb = byId('war-sidebar');
+    if (sb) sb.classList.add('collapsed');
+  });
+}
+if (byId('war-close-sidebar-2')) {
+  byId('war-close-sidebar-2').addEventListener('click', function() {
+    var sb = byId('war-sidebar');
+    if (sb) sb.classList.add('collapsed');
+  });
+}
+
+if (byId('war-login-btn')) {
+  byId('war-login-btn').addEventListener('click', async function() {
+    var address = byId('war-login-address').value.trim();
+    var password = byId('war-login-password').value;
+    if (!address || !password) {
+      setText('war-login-message', 'Enter your address and password.');
+      return;
+    }
+    try {
+      await doLogin(address, password);
+      updateAuthUI();
+      setText('war-login-message', '');
+      refreshAccount();
+      refresh();
+    } catch (error) {
+      setText('war-login-message', error.message);
+    }
+  });
+}
+
+if (byId('miner-login-btn')) {
+  byId('miner-login-btn').addEventListener('click', async function() {
+    var address = byId('miner-login-address').value.trim();
+    var password = byId('miner-login-password').value;
+    if (!address || !password) {
+      setText('miner-login-message', 'Enter your address and password.');
+      return;
+    }
+    try {
+      await doLogin(address, password);
+      if (byId('address-filter')) byId('address-filter').value = address;
+      if (byId('miner-address')) byId('miner-address').value = address;
+      updateAuthUI();
+      refreshAccount();
+      refresh();
+    } catch (error) {
+      setText('miner-login-message', error.message);
+    }
+  });
+}
+
+if (byId('miner-logout-btn')) {
+  byId('miner-logout-btn').addEventListener('click', function() {
+    doLogout();
+    refresh();
+  });
+}
+
+var rarityColors = {
+  common: '#b9b4b0',
+  uncommon: '#78f5a5',
+  rare: '#8ca5ff',
+  epic: '#b36bff',
+  legendary: '#ffb140'
+};
+
+function renderInventory(containerId, items) {
+  var container = byId(containerId);
+  if (!container) return;
+  if (!items || !items.length) {
+    container.innerHTML = '<p class="war-muted empty">No items yet. Mine to earn loot.</p>';
+    return;
+  }
+  container.innerHTML = items.map(function(item) {
+    var color = rarityColors[item.rarity] || '#b9b4b0';
+    return '<div class="inventory-item" style="border-color:' + color + '">' +
+      '<div class="inv-header"><strong style="color:' + color + '">' + escapeHtml(item.name) + '</strong><span class="inv-qty">x' + item.quantity + '</span></div>' +
+      '<span class="inv-type">' + escapeHtml(item.rarity) + ' ' + escapeHtml(item.type) + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function renderAccountInfo(data) {
+  var container = byId('war-account-info');
+  if (container && data) {
+    container.innerHTML =
+      '<div class="war-intel-name">' + escapeHtml(shortAddress(data.address)) + '</div>' +
+      '<div class="war-intel-meta">Level ' + data.level + ' | XP: ' + data.xp.toLocaleString() + '</div>' +
+      '<div class="war-intel-meta">' + data.workers + ' workers | ' + data.activeWorkers + ' active | ' + formatHashrate(data.hashrate) + '</div>' +
+      '<button id="war-logout-btn" class="war-deploy-btn" style="margin-top:8px">Log Out</button>';
+    if (byId('war-logout-btn')) {
+      byId('war-logout-btn').addEventListener('click', function() {
+        doLogout();
+        refresh();
+      });
+    }
+  }
+  setText('account-level', data ? data.level : '1');
+  setText('account-xp', data ? data.xp.toLocaleString() : '0');
+}
+
+async function refreshAccount() {
+  if (!isLoggedIn()) return;
+  try {
+    var account = await getJsonAuth('/api/account');
+    if (account) {
+      renderAccountInfo(account);
+      renderInventory('war-inventory', account.inventory);
+      renderInventory('miner-inventory', account.inventory);
+    }
+  } catch (e) {
+    console.error('Account refresh failed:', e);
+  }
+}
+
+if (isLoggedIn()) {
+  var addr = getAuthAddress();
+  if (byId('address-filter')) byId('address-filter').value = addr;
+  if (byId('miner-address')) byId('miner-address').value = addr;
+}
 
 var initialFilter = currentAddressFilter();
 if (initialFilter) {
@@ -443,9 +961,18 @@ function updateMissionClock() {
 }
 
 updateMissionClock();
+updateAuthUI();
+connectSSE();
 if (byId('connect-host')) {
   updateConnectPreview();
 }
 setInterval(updateMissionClock, 1000);
+setInterval(function() {
+  interpolateCounter('wars-units');
+  interpolateCounter('wars-active-units');
+  interpolateCounter('wars-energy');
+}, 60);
 refresh();
+refreshAccount();
 setInterval(refresh, 15000);
+setInterval(refreshAccount, 30000);

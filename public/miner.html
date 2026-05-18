@@ -21,7 +21,8 @@
       <a href="/" class="nav-item"><span>01</span><strong>Pool Console</strong><small>Pool-wide telemetry.</small></a>
       <a href="/connect" class="nav-item"><span>02</span><strong>Connect Rig</strong><small>Generate connection fields.</small></a>
       <a href="/miner" class="nav-item"><span>03</span><strong>Miner Dashboard</strong><small>Workers, balances, payout settings.</small></a>
-      <a href="/proof" class="nav-item"><span>04</span><strong>Proof Trail</strong><small>Blocks and payouts.</small></a>
+      <a href="/wars" class="nav-item"><span>04</span><strong>Hash Wars</strong><small>Faction warfare powered by real hashrate.</small></a>
+      <a href="/proof" class="nav-item"><span>05</span><strong>Proof Trail</strong><small>Blocks and payouts.</small></a>
     </div>
   </aside>
 
@@ -42,47 +43,67 @@
       <a href="/">Pool Console</a>
       <a href="/connect">Connect Rig</a>
       <a href="/miner" id="miner-link">Miner Dashboard</a>
+      <a href="/wars">Hash Wars</a>
       <a href="/proof">Proof Trail</a>
     </nav>
 
-    <section class="mission-grid">
-      <aside class="panel mission-panel uplink-panel">
-        <p class="panel-kicker">// Address Uplink</p>
-        <h2>Select miner address</h2>
-        <p class="muted">Enter a payout address or open <code>/dashboard/E...</code>.</p>
-        <input id="address-filter" placeholder="Filter by payout address">
-        <div class="uplink-readout"><span>Selected address</span><strong id="selected-address-readout">Pool-wide</strong></div>
-      </aside>
-
-      <section class="panel mission-panel" id="miner-panel">
-        <div class="panel-header">
-          <div><p class="panel-kicker">// Miner Bay</p><h2>Per-address command console</h2><p class="muted">Worker manifest, payout balance, manual payout, and automatic payout settings.</p></div>
-          <input id="miner-address" placeholder="Enter EVR payout address">
-        </div>
-        <div class="grid stats">
-          <div><span>Address</span><strong id="miner-address-label">-</strong></div>
-          <div><span>Miner Hashrate</span><strong id="miner-hashrate">0 H/s</strong></div>
-          <div><span>Unpaid Balance</span><strong id="miner-unpaid">0 EVR</strong></div>
-          <div><span>Eligible Mature Payout</span><strong id="miner-eligible">0 EVR</strong></div>
-        </div>
-        <div class="settings-grid">
-          <label class="toggle"><input type="checkbox" id="auto-payout"><span>Auto payout enabled for this address</span></label>
-          <label>Payout threshold (EVR)<input id="payout-threshold" type="number" min="0" step="0.00000001"></label>
-          <button id="save-payout-settings">Save settings</button>
-          <button id="manual-payout">Manual payout</button>
-        </div>
-        <p class="muted console-message" id="payout-message">Payout controls are in standby until an address is selected.</p>
-      </section>
+    <section class="panel mission-panel auth-login-section" id="miner-login-panel">
+      <div class="panel-header"><div><p class="panel-kicker">// Authenticate</p><h2>Log in to your dashboard</h2><p class="muted">Enter your EVR payout address and the password you used when connecting your miner via stratum.</p></div></div>
+      <div class="settings-grid" style="grid-template-columns: 1fr 1fr auto">
+        <label>EVR Address<input id="miner-login-address" placeholder="Your payout address"></label>
+        <label>Password<input id="miner-login-password" type="password" placeholder="Miner password"></label>
+        <button id="miner-login-btn">Log In</button>
+      </div>
+      <p class="muted console-message" id="miner-login-message">Each worker can have its own password. All workers under the same address share this dashboard.</p>
     </section>
 
-    <section class="panel mission-panel">
-      <div class="panel-header"><div><p class="panel-kicker">// Worker Manifest</p><h2>Rig telemetry</h2><p class="muted">Workers for the selected payout address.</p></div></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Worker</th><th>Hashrate</th><th>Valid</th><th>Invalid</th><th>Blocks</th><th>Unpaid</th><th>Last Share</th></tr></thead>
-          <tbody id="workers"></tbody>
-        </table>
-      </div>
+    <section class="auth-protected" style="display:none">
+      <section class="mission-grid">
+        <aside class="panel mission-panel uplink-panel">
+          <p class="panel-kicker">// Authenticated</p>
+          <h2>Account: <span class="auth-address-label"></span></h2>
+          <p class="muted">All workers under this address share XP, inventory, and war progress.</p>
+          <div class="uplink-readout"><span>Account level</span><strong id="account-level">1</strong></div>
+          <div class="uplink-readout"><span>Total XP</span><strong id="account-xp">0</strong></div>
+          <button id="miner-logout-btn" style="margin-top:12px">Log Out</button>
+          <input id="address-filter" type="hidden">
+          <input id="miner-address" type="hidden">
+        </aside>
+
+        <section class="panel mission-panel" id="miner-panel">
+          <div class="panel-header">
+            <div><p class="panel-kicker">// Miner Bay</p><h2>Per-address command console</h2><p class="muted">Worker manifest, payout balance, manual payout, and automatic payout settings.</p></div>
+          </div>
+          <div class="grid stats">
+            <div><span>Address</span><strong id="miner-address-label">-</strong></div>
+            <div><span>Miner Hashrate</span><strong id="miner-hashrate">0 H/s</strong></div>
+            <div><span>Unpaid Balance</span><strong id="miner-unpaid">0 EVR</strong></div>
+            <div><span>Eligible Mature Payout</span><strong id="miner-eligible">0 EVR</strong></div>
+          </div>
+          <div class="settings-grid">
+            <label class="toggle"><input type="checkbox" id="auto-payout"><span>Auto payout enabled</span></label>
+            <label>Payout threshold (EVR)<input id="payout-threshold" type="number" min="0" step="0.00000001"></label>
+            <button id="save-payout-settings">Save settings</button>
+            <button id="manual-payout">Manual payout</button>
+          </div>
+          <p class="muted console-message" id="payout-message">Payout controls ready.</p>
+        </section>
+      </section>
+
+      <section class="panel mission-panel">
+        <div class="panel-header"><div><p class="panel-kicker">// Inventory</p><h2>Your items</h2><p class="muted">Earned from mining milestones, boss defeats, blocks found, and territory warfare.</p></div></div>
+        <div id="miner-inventory" class="inventory-grid"></div>
+      </section>
+
+      <section class="panel mission-panel">
+        <div class="panel-header"><div><p class="panel-kicker">// Worker Manifest</p><h2>Rig telemetry</h2><p class="muted">Workers for your payout address.</p></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Worker</th><th>Hashrate</th><th>Valid</th><th>Invalid</th><th>Blocks</th><th>Unpaid</th><th>Last Share</th></tr></thead>
+            <tbody id="workers"></tbody>
+          </table>
+        </div>
+      </section>
     </section>
   </main>
 

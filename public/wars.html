@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hash Wars | Manticore EVR Pool</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body data-page="wars">
+  <div class="scanline" aria-hidden="true"></div>
+
+  <div class="battlefield" id="battlefield">
+    <canvas id="war-canvas"></canvas>
+
+    <header class="war-topbar">
+      <a class="war-brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <strong>HASH WARS</strong>
+      </a>
+      <div class="war-event-ticker" id="war-event-ticker">
+        <span class="war-event-label" id="wars-event-name">Loading...</span>
+        <div class="war-event-meter">
+          <div class="war-event-fill" id="wars-event-bar"></div>
+        </div>
+        <span class="war-event-pct" id="wars-event-progress">0%</span>
+      </div>
+      <div class="war-topbar-stats">
+        <div><span>UNITS</span><strong id="wars-units">0</strong></div>
+        <div><span>ACTIVE</span><strong id="wars-active-units">0</strong></div>
+        <div><span>HASHRATE</span><strong id="wars-hashrate">0</strong></div>
+        <div><span>PRESSURE</span><strong id="wars-energy">0</strong></div>
+      </div>
+      <div class="war-topbar-actions">
+        <button class="war-btn-icon" id="war-toggle-sidebar" type="button" title="Toggle panel">&#9776;</button>
+        <a class="war-btn-icon" href="/" title="Pool console">&#8962;</a>
+      </div>
+    </header>
+
+    <div class="war-faction-bar" id="war-faction-bar"></div>
+
+    <div class="war-sidebar" id="war-sidebar">
+      <div class="war-sidebar-section auth-login-section" id="war-login-section">
+        <div class="war-sidebar-header"><span>AUTHENTICATE</span>
+          <button class="war-btn-close" id="war-close-sidebar" type="button">&times;</button>
+        </div>
+        <p class="war-muted">Log in with your EVR address and the password you set when connecting your miner.</p>
+        <div class="war-deploy-form">
+          <label>Address<input id="war-login-address" placeholder="EVR payout address"></label>
+          <label>Password<input id="war-login-password" type="password" placeholder="Miner password"></label>
+          <button id="war-login-btn" class="war-deploy-btn">Log In</button>
+        </div>
+        <p class="war-muted war-deploy-msg" id="war-login-message"></p>
+      </div>
+
+      <div class="war-sidebar-section auth-protected" id="war-account-section" style="display:none">
+        <div class="war-sidebar-header"><span>ACCOUNT</span>
+          <button class="war-btn-close" id="war-close-sidebar-2" type="button">&times;</button>
+        </div>
+        <div id="war-account-info" class="war-account-summary"></div>
+      </div>
+
+      <div class="war-sidebar-section">
+        <div class="war-sidebar-header"><span>SECTOR INTEL</span></div>
+        <div id="wars-sector-detail" class="war-sector-intel">
+          <p class="war-muted">Click a sector on the map</p>
+        </div>
+      </div>
+
+      <div class="war-sidebar-section auth-protected" style="display:none">
+        <div class="war-sidebar-header"><span>INVENTORY</span></div>
+        <div id="war-inventory" class="war-inventory-grid"></div>
+      </div>
+
+      <div class="war-sidebar-section">
+        <div class="war-sidebar-header"><span>BATTLE LOG</span></div>
+        <div id="wars-battle-log" class="war-log-list"></div>
+      </div>
+
+      <div class="war-sidebar-section">
+        <div class="war-sidebar-header"><span>TOP UNITS</span></div>
+        <div id="wars-units-list" class="war-unit-list"></div>
+      </div>
+
+      <div class="war-sidebar-section auth-protected" style="display:none">
+        <div class="war-sidebar-header"><span>DEPLOY UNIT</span></div>
+        <div class="war-deploy-form">
+          <label>Worker<select id="wars-command-worker"></select></label>
+          <label>Callsign<input id="wars-command-callsign" placeholder="NecroNoncer"></label>
+          <label>Faction<select id="wars-command-faction"></select></label>
+          <label>Sector<select id="wars-command-territory"></select></label>
+          <label>Stance<select id="wars-command-stance"></select></label>
+          <button id="wars-command-save" class="war-deploy-btn">Deploy</button>
+        </div>
+        <p class="war-muted war-deploy-msg" id="wars-command-message"></p>
+      </div>
+    </div>
+
+    <div class="war-live-feed-wrap" id="war-live-feed-wrap">
+      <div class="war-live-feed-header"><span class="feed-dot"></span> LIVE COMBAT FEED</div>
+      <div id="war-live-feed" class="war-live-feed"></div>
+    </div>
+
+    <div class="war-big-moment" id="war-big-moment"></div>
+    <div class="war-network-alert" id="war-network-alert"></div>
+  </div>
+
+  <script src="/warfield.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

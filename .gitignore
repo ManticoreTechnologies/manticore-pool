@@ -1,3 +1,4 @@
 node_modules
 cockroach-data
 evrmore-node/evrmored
+data/
