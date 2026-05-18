@@ -758,6 +758,39 @@ code {
   position: absolute;
 }
 
+.war-forest-layer,
+.war-facility-layer,
+.war-unit-layer {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.war-forest {
+  border: 1px solid rgba(120,245,165,0.22);
+  border-radius: 46% 54% 52% 48%;
+  height: calc(var(--size) * 1px);
+  left: calc(var(--x) * 1%);
+  opacity: calc(0.18 + var(--density) * 0.05);
+  position: absolute;
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%) rotate(calc(var(--density) * 12deg));
+  width: calc(var(--size) * 1.6px);
+}
+
+.war-forest::before,
+.war-forest::after {
+  border: 1px solid rgba(120,245,165,0.18);
+  border-radius: inherit;
+  content: "";
+  inset: 3px;
+  position: absolute;
+}
+
+.war-forest::after {
+  inset: 7px;
+}
+
 .war-sector {
   align-items: center;
   background:
@@ -799,6 +832,99 @@ code {
 
 .war-sector strong {
   font-size: 0.78rem;
+}
+
+.war-facility {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--owner), transparent 12%);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--owner), transparent 60%);
+  height: 26px;
+  left: calc(var(--x) * 1%);
+  min-width: 0;
+  padding: 0;
+  pointer-events: auto;
+  position: absolute;
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%);
+  width: 26px;
+  z-index: 3;
+}
+
+.war-facility span {
+  border: 1px solid color-mix(in srgb, var(--owner), white 25%);
+  display: block;
+  height: 12px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+}
+
+.facility-power-plant span {
+  border-radius: 50%;
+}
+
+.facility-relay span {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.facility-foundry span {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.facility-shield-array {
+  border-radius: 50%;
+}
+
+.facility-data-vault span {
+  width: 16px;
+}
+
+.map-unit {
+  align-items: center;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--orange);
+  border-radius: 50%;
+  color: var(--text);
+  display: grid;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  height: 24px;
+  left: calc(var(--x) * 1%);
+  min-width: 0;
+  padding: 0;
+  place-items: center;
+  pointer-events: auto;
+  position: absolute;
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%);
+  width: 24px;
+  z-index: 4;
+}
+
+.map-unit.active {
+  animation: unitPulse 1.8s ease-in-out infinite;
+}
+
+.stance-assault {
+  border-color: var(--red);
+  box-shadow: 0 0 18px rgba(255,91,99,0.52);
+}
+
+.stance-defend {
+  border-color: var(--blue);
+  box-shadow: 0 0 18px rgba(140,165,255,0.52);
+}
+
+.stance-recon {
+  border-color: var(--green);
+  box-shadow: 0 0 18px rgba(120,245,165,0.52);
+}
+
+@keyframes unitPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.22); }
 }
 
 .sector-detail {

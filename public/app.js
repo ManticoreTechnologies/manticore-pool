@@ -279,6 +279,31 @@ function renderWarMap(state) {
     return '<line x1="' + link.x1 + '" y1="' + link.y1 + '" x2="' + link.x2 + '" y2="' + link.y2 + '"></line>';
   }).join('');
 
+  var forests = byId('wars-map-forests');
+  if (forests) {
+    forests.innerHTML = (state.map.forests || []).map(function(forest) {
+      return '<span class="war-forest" style="--x:' + forest.x + ';--y:' + forest.y + ';--size:' + forest.size + ';--density:' + forest.density + '"></span>';
+    }).join('');
+  }
+
+  var facilities = byId('wars-map-facilities');
+  if (facilities) {
+    facilities.innerHTML = (state.map.facilities || []).map(function(facility) {
+      return '<button class="war-facility facility-' + escapeHtml(facility.type) + '" data-sector="' + escapeHtml(facility.sectorId) + '" title="' + escapeHtml(facility.name + ' - ' + facility.bonus) + '" style="--x:' + facility.x + ';--y:' + facility.y + ';--owner:' + escapeHtml(facility.ownerColor) + '">' +
+        '<span></span>' +
+        '</button>';
+    }).join('');
+  }
+
+  var mapUnits = byId('wars-map-units');
+  if (mapUnits) {
+    mapUnits.innerHTML = (state.mapUnits || []).map(function(unit) {
+      return '<button class="map-unit stance-' + escapeHtml(unit.stance) + ' ' + (unit.active ? 'active' : '') + '" data-worker="' + escapeHtml(unit.workername) + '" title="' + escapeHtml(unit.callsign + ' / ' + unit.className) + '" style="--x:' + unit.x + ';--y:' + unit.y + '">' +
+        '<span>' + escapeHtml(unit.callsign.slice(0, 2).toUpperCase()) + '</span>' +
+        '</button>';
+    }).join('');
+  }
+
   var selected = layer.getAttribute('data-selected') || (state.territories[0] && state.territories[0].id);
   layer.innerHTML = state.territories.map(function(territory) {
     var active = territory.id === selected ? ' selected' : '';
@@ -294,18 +319,34 @@ function renderWarMap(state) {
       renderWarMap(state);
     });
   });
+  Array.prototype.forEach.call(document.querySelectorAll('.war-facility'), function(button) {
+    button.addEventListener('click', function() {
+      layer.setAttribute('data-selected', button.getAttribute('data-sector'));
+      renderWarMap(state);
+    });
+  });
 
   var detail = state.territories.find(function(territory) { return territory.id === selected; }) || state.territories[0];
-  renderSectorDetail(detail);
+  var sectorFacilities = (state.map.facilities || []).filter(function(facility) { return facility.sectorId === (detail && detail.id); });
+  var sectorUnits = (state.mapUnits || []).filter(function(unit) { return detail && unit.territory === detail.name; });
+  renderSectorDetail(detail, sectorFacilities, sectorUnits);
 }
 
-function renderSectorDetail(territory) {
+function renderSectorDetail(territory, facilities, units) {
   var container = byId('wars-sector-detail');
   if (!container || !territory) return;
+  var facilityText = facilities && facilities.length
+    ? facilities.map(function(facility) { return facility.name + ' (' + facility.bonus + ')'; }).join(' | ')
+    : 'No facilities';
+  var unitText = units && units.length
+    ? units.map(function(unit) { return unit.callsign + ' [' + unit.stance + ']'; }).join(' | ')
+    : 'No deployed units';
   container.innerHTML = '<article class="territory-card">' +
     '<span>' + escapeHtml(territory.status) + ' / ' + escapeHtml(territory.anomaly) + '</span>' +
     '<strong>' + escapeHtml(territory.name) + '</strong>' +
     '<small>' + escapeHtml(territory.ownerName) + ' control: ' + territory.control + '% | ' + escapeHtml(territory.buff) + '</small>' +
+    '<small>Facilities: ' + escapeHtml(facilityText) + '</small>' +
+    '<small>Units: ' + escapeHtml(unitText) + '</small>' +
     '</article>';
 }
 
