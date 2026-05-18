@@ -69,6 +69,6 @@
   "scripts": {
     "start": "node server.js mainnet",
     "start:testnet": "node server.js testnet",
-    "check": "node --check server.js && node --check config.js && node --check lib/poolStatsStore.js && node --check lib/bignumCompat.js && node --check lib/base58.js && node --check lib/transactions.js && node --check lib/jobManager.js && node --check lib/stratum.js"
+    "check": "node --check server.js && node --check config.js && node --check lib/poolStatsStore.js && node --check lib/rigMeta.js && node --check lib/bignumCompat.js && node --check lib/base58.js && node --check lib/transactions.js && node --check lib/jobManager.js && node --check lib/stratum.js"
   }
 }

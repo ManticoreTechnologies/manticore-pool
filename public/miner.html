@@ -76,12 +76,29 @@
     </section>
 
     <section class="panel mission-panel">
-      <div class="panel-header"><div><p class="panel-kicker">// Worker Manifest</p><h2>Rig telemetry</h2><p class="muted">Workers for the selected payout address.</p></div></div>
+      <div class="panel-header"><div><p class="panel-kicker">// Worker Manifest</p><h2>Rig telemetry</h2><p class="muted">Workers for the selected payout address. Each rig gets a callsign, league badge, and signal stats.</p></div></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Worker</th><th>Hashrate</th><th>Valid</th><th>Invalid</th><th>Blocks</th><th>Unpaid</th><th>Last Share</th></tr></thead>
+          <thead><tr><th>Rig</th><th>League</th><th>Hashrate</th><th>Valid</th><th>Invalid</th><th>Blocks</th><th>Efficiency</th><th>Hot streak</th><th>Survival</th><th>Lucky / Near</th><th>Unpaid</th><th>Last Share</th></tr></thead>
           <tbody id="workers"></tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="panel mission-panel boss-panel" id="boss-panel-miner">
+      <div class="panel-header">
+        <div>
+          <p class="panel-kicker">// Community Event</p>
+          <h2 id="boss-title-miner">Boss Battle</h2>
+          <p class="muted" id="boss-week-miner">Week</p>
+        </div>
+      </div>
+      <div class="boss-track">
+        <div class="boss-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="boss-bar-wrap-miner">
+          <div class="boss-fill" id="boss-fill-miner"></div>
+        </div>
+        <p class="boss-readout" id="boss-readout-miner"></p>
+        <ul class="reward-list" id="boss-rewards-miner"></ul>
       </div>
     </section>
   </main>

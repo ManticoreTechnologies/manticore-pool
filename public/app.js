@@ -9,6 +9,31 @@ function formatHashrate(value) {
   return rate.toFixed(index === 0 ? 0 : 2) + ' ' + units[index];
 }
 
+function formatHours(value) {
+  var n = Number(value || 0);
+  return n.toFixed(1) + ' rig-h';
+}
+
+function formatDuration(ms) {
+  var s = Math.floor(Number(ms || 0) / 1000);
+  if (s < 60) {
+    return s + 's';
+  }
+  var m = Math.floor(s / 60);
+  if (m < 120) {
+    return m + 'm';
+  }
+  var h = Math.floor(m / 60);
+  return h + 'h ' + (m % 60) + 'm';
+}
+
+function formatEfficiency(worker) {
+  if (worker.efficiency == null) {
+    return '-';
+  }
+  return (worker.efficiency * 100).toFixed(1) + '%';
+}
+
 function formatEvr(sats) {
   return (Number(sats || 0) / 100000000).toFixed(8) + ' EVR';
 }
@@ -137,19 +162,25 @@ function renderWorkers(workers) {
 
   if (!workers.length) {
     var emptyRow = document.createElement('tr');
-    emptyRow.innerHTML = '<td colspan="7" class="empty">No workers found yet.</td>';
+    emptyRow.innerHTML = '<td colspan="12" class="empty">No workers found yet.</td>';
     tbody.appendChild(emptyRow);
     return;
   }
 
   workers.forEach(function(worker) {
     var row = document.createElement('tr');
+    var luckyNear = (worker.luckyShares || 0) + ' / ' + (worker.jackpotNearHits || 0);
     row.innerHTML = [
-      '<td><strong>' + escapeHtml(worker.workername) + '</strong><small>' + escapeHtml(worker.address) + '</small></td>',
+      '<td class="rig-cell"><strong>' + escapeHtml(worker.rigCallsign || worker.workername) + '</strong><small>' + escapeHtml(worker.workername) + '</small></td>',
+      '<td><span class="league-chip">' + escapeHtml(worker.alliance && worker.alliance.name ? worker.alliance.name : '-') + '</span><small>' + escapeHtml(worker.faction && worker.faction.name ? worker.faction.name : '-') + '</small></td>',
       '<td>' + formatHashrate(worker.hashrate) + '</td>',
       '<td>' + (worker.valid || 0) + '</td>',
       '<td>' + (worker.invalid || 0) + '</td>',
       '<td>' + (worker.blocks || 0) + '</td>',
+      '<td>' + formatEfficiency(worker) + '</td>',
+      '<td>' + formatDuration(worker.uptimeStreakMs) + '</td>',
+      '<td>' + (worker.survivalStreak || 0) + '</td>',
+      '<td>' + escapeHtml(luckyNear) + '</td>',
       '<td>' + formatEvr(worker.unpaid) + '</td>',
       '<td>' + (worker.lastsharetime ? new Date(worker.lastsharetime).toLocaleString() : '-') + '</td>'
     ].join('');
@@ -222,6 +253,98 @@ function renderMiner(summary) {
   }
 }
 
+function renderFactions(board) {
+  if (!board) {
+    return;
+  }
+  setText('factions-season', board.season ? 'Season ' + board.season : '');
+  var copyEl = byId('factions-copy');
+  if (copyEl && board.copy) {
+    copyEl.textContent = board.copy;
+  }
+  var strip = byId('alliances-strip');
+  if (strip && board.alliances) {
+    strip.innerHTML = board.alliances.map(function(a) {
+      return '<article class="alliance-chip"><h3>' + escapeHtml(a.name) + '</h3><p class="muted small">' + escapeHtml(a.subtitle || '') + '</p>' +
+        '<div class="mini-stats"><div><span>Hashrate</span><strong>' + formatHashrate(a.hashrate) + '</strong></div>' +
+        '<div><span>Active rigs</span><strong>' + (a.workersActive || 0) + '</strong></div>' +
+        '<div><span>Blocks (rig sum)</span><strong>' + (a.blocksLifetime || 0) + '</strong></div></div></article>';
+    }).join('');
+  }
+  var grid = byId('factions-board');
+  if (grid && board.factions) {
+    grid.innerHTML = board.factions.map(function(f) {
+      return '<article class="faction-card"><h3>' + escapeHtml(f.name) + '</h3><p class="muted small">' + escapeHtml(f.tagline) + '</p>' +
+        '<ul class="faction-stats">' +
+        '<li><span>Hashrate</span><strong>' + formatHashrate(f.hashrate) + '</strong></li>' +
+        '<li><span>Blocks found</span><strong>' + (f.blocksLifetime || 0) + '</strong></li>' +
+        '<li><span>Uptime mass</span><strong>' + formatHours(f.rigHours) + '</strong></li>' +
+        '<li><span>Season wins</span><strong>' + (f.seasonWins || 0) + '</strong></li>' +
+        '<li><span>Crew online</span><strong>' + (f.workersActive || 0) + ' / ' + (f.workersTotal || 0) + '</strong></li>' +
+        '</ul></article>';
+    }).join('');
+  }
+}
+
+function renderCommunityEventView(data, ids) {
+  if (!data || !ids) {
+    return;
+  }
+  if (!byId(ids.title)) {
+    return;
+  }
+  setText(ids.title, data.title);
+  setText(ids.week, 'Week ' + (data.weekKey || '-') + ' · ' + (data.percentComplete || 0) + '% charged');
+  var fill = byId(ids.fill);
+  if (fill) {
+    fill.style.width = Math.min(100, data.percentComplete || 0) + '%';
+  }
+  var wrap = byId(ids.barWrap);
+  if (wrap) {
+    wrap.setAttribute('aria-valuenow', String(Math.min(100, data.percentComplete || 0)));
+  }
+  var remain = Math.max(0, (data.targetValidSharesDelta || 0) - (data.progressValidShares || 0));
+  var readout = data.completed
+    ? 'Victory recorded for ' + (data.weekKey || 'this week') + '. Loot table unlocked below.'
+    : (data.progressValidShares || 0) + ' / ' + (data.targetValidSharesDelta || 0) + ' valid shares this week · ' + remain + ' to go.';
+  setText(ids.readout, readout);
+  var ul = byId(ids.rewards);
+  if (ul && data.rewardCopy) {
+    ul.innerHTML = data.rewardCopy.map(function(line) {
+      return '<li>' + escapeHtml(line) + '</li>';
+    }).join('');
+  }
+}
+
+async function refreshArena() {
+  var needs = byId('factions-board') || byId('boss-fill') || byId('boss-fill-miner');
+  if (!needs) {
+    return;
+  }
+  try {
+    var pair = await Promise.all([getJson('/api/factions'), getJson('/api/community-event')]);
+    renderFactions(pair[0]);
+    renderCommunityEventView(pair[1], {
+      title: 'boss-title',
+      week: 'boss-week',
+      fill: 'boss-fill',
+      readout: 'boss-readout',
+      rewards: 'boss-rewards',
+      barWrap: 'boss-bar-wrap'
+    });
+    renderCommunityEventView(pair[1], {
+      title: 'boss-title-miner',
+      week: 'boss-week-miner',
+      fill: 'boss-fill-miner',
+      readout: 'boss-readout-miner',
+      rewards: 'boss-rewards-miner',
+      barWrap: 'boss-bar-wrap-miner'
+    });
+  } catch (err) {
+    console.warn('Arena refresh skipped', err);
+  }
+}
+
 async function refresh() {
   var health = byId('health');
   try {
@@ -260,6 +383,7 @@ async function refresh() {
       if (byId('miner-panel')) byId('miner-panel').style.display = '';
       renderMiner({ address: '', totals: {}, preferences: { payoutThreshold: results[0].payoutThreshold || 0 }, payoutCandidates: { total: 0 } });
     }
+    await refreshArena();
   } catch (error) {
     health.textContent = 'Dashboard error';
     health.className = 'status warning';

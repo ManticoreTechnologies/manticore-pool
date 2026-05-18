@@ -6,6 +6,7 @@ const cors = require('cors');
 const daemon = require('./lib/daemon.js');
 const Stratum = require('./lib/index.js');
 const PoolStatsStore = require('./lib/poolStatsStore.js');
+const rigMeta = require('./lib/rigMeta.js');
 const { options, evrmore_config_path } = require('./config.js');
 
 function parseNumber(value, fallback) {
@@ -15,6 +16,10 @@ function parseNumber(value, fallback) {
 
 function satsToEvr(amount) {
     return Number((parseNumber(amount, 0) / 100000000).toFixed(8));
+}
+
+function enrichWorkersList(list) {
+    return (list || []).map(worker => rigMeta.enrichWorker(worker));
 }
 
 function requirePayoutAdmin(req, res) {
@@ -371,12 +376,20 @@ app.get('/api/poolstats', (req, res) => {
     res.json(stats.getPoolStats());
 });
 
+app.get('/api/factions', (req, res) => {
+    res.json(stats.getFactionsBoard());
+});
+
+app.get('/api/community-event', (req, res) => {
+    res.json(stats.getCommunityEventSnapshot());
+});
+
 app.get('/api/workers', (req, res) => {
-    res.json(stats.getWorkers());
+    res.json(enrichWorkersList(stats.getWorkers()));
 });
 
 app.get('/api/workers/:address', (req, res) => {
-    res.json(stats.getWorkersByAddress(req.params.address));
+    res.json(enrichWorkersList(stats.getWorkersByAddress(req.params.address)));
 });
 
 app.get('/connect', (req, res) => {
@@ -396,7 +409,9 @@ app.get('/payouts', (req, res) => {
 });
 
 app.get('/api/miner/:address', (req, res) => {
-    res.json(stats.getAddressSummary(req.params.address, options.payoutMaturityConfirmations));
+    const summary = stats.getAddressSummary(req.params.address, options.payoutMaturityConfirmations);
+    summary.workers = enrichWorkersList(summary.workers);
+    res.json(summary);
 });
 
 app.put('/api/miner/:address/payout-settings', (req, res) => {
@@ -431,11 +446,13 @@ app.get('/dashboard/:address', (req, res) => {
         res.sendFile(path.join(__dirname, 'public', 'miner.html'));
         return;
     }
-    res.json(stats.getWorkersByAddress(req.params.address));
+    res.json(enrichWorkersList(stats.getWorkersByAddress(req.params.address)));
 });
 
 app.get('/api/dashboard/:address', (req, res) => {
-    res.json(stats.getAddressSummary(req.params.address, options.payoutMaturityConfirmations));
+    const summary = stats.getAddressSummary(req.params.address, options.payoutMaturityConfirmations);
+    summary.workers = enrichWorkersList(summary.workers);
+    res.json(summary);
 });
 
 app.get('/api/shares', (req, res) => {
