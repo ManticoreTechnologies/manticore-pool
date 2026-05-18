@@ -654,6 +654,367 @@ code {
   position: relative;
 }
 
+.hashwars-hero {
+  align-items: center;
+  background:
+    radial-gradient(circle at 78% 20%, rgba(255, 91, 99, 0.16), transparent 22rem),
+    linear-gradient(135deg, rgba(18, 11, 11, 0.9), rgba(3, 4, 9, 0.92));
+  border: 1px solid rgba(255,157,46,0.3);
+  box-shadow: var(--shadow), inset 0 0 80px rgba(255,91,99,0.06);
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr minmax(280px, 0.45fr);
+  margin-bottom: 16px;
+  min-height: 320px;
+  overflow: hidden;
+  padding: clamp(22px, 4vw, 46px);
+  position: relative;
+}
+
+.hashwars-hero h2 {
+  color: var(--orange);
+  font-size: clamp(2.4rem, 6vw, 5.5rem);
+  letter-spacing: -0.08em;
+  line-height: 0.9;
+}
+
+.boss-meter {
+  background: rgba(3,4,9,0.76);
+  border: 1px solid rgba(255,157,46,0.22);
+  padding: 22px;
+}
+
+.boss-meter span,
+.boss-meter small {
+  color: var(--muted);
+  display: block;
+  font-family: var(--mono);
+}
+
+.boss-meter strong {
+  display: block;
+  font-family: var(--mono);
+  font-size: 3rem;
+  margin: 10px 0;
+}
+
+.meter-track {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,157,46,0.18);
+  height: 12px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.meter-track > div {
+  background: linear-gradient(90deg, var(--orange), var(--amber));
+  height: 100%;
+}
+
+.faction-grid,
+.territory-grid,
+.unit-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.faction-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.territory-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.war-map {
+  aspect-ratio: 16 / 10;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,157,46,0.1), transparent 22rem),
+    linear-gradient(rgba(255,157,46,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,157,46,0.045) 1px, transparent 1px),
+    rgba(2, 4, 10, 0.72);
+  background-size: auto, 40px 40px, 40px 40px, auto;
+  border: 1px solid rgba(255,157,46,0.2);
+  margin-bottom: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+#wars-map-links {
+  inset: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#wars-map-links line {
+  stroke: rgba(255,177,64,0.28);
+  stroke-width: 0.35;
+  filter: drop-shadow(0 0 4px rgba(255,157,46,0.42));
+}
+
+.war-sector-layer {
+  inset: 0;
+  position: absolute;
+}
+
+.war-forest-layer,
+.war-facility-layer,
+.war-unit-layer {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.war-forest {
+  border: 1px solid rgba(120,245,165,0.22);
+  border-radius: 46% 54% 52% 48%;
+  height: calc(var(--size) * 1px);
+  left: calc(var(--x) * 1%);
+  opacity: calc(0.18 + var(--density) * 0.05);
+  position: absolute;
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%) rotate(calc(var(--density) * 12deg));
+  width: calc(var(--size) * 1.6px);
+}
+
+.war-forest::before,
+.war-forest::after {
+  border: 1px solid rgba(120,245,165,0.18);
+  border-radius: inherit;
+  content: "";
+  inset: 3px;
+  position: absolute;
+}
+
+.war-forest::after {
+  inset: 7px;
+}
+
+.war-sector {
+  align-items: center;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--owner), white 12%), color-mix(in srgb, var(--owner), transparent 76%));
+  border: 1px solid color-mix(in srgb, var(--owner), white 18%);
+  border-radius: 50%;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--owner), transparent 45%);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  height: calc(var(--size) * 1px + 38px);
+  justify-content: center;
+  left: calc(var(--x) * 1%);
+  min-height: 54px;
+  min-width: 54px;
+  padding: 8px;
+  position: absolute;
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%);
+  width: calc(var(--size) * 1px + 38px);
+  z-index: 2;
+}
+
+.war-sector:hover,
+.war-sector.selected {
+  border-color: var(--amber);
+  box-shadow: 0 0 28px rgba(255,177,64,0.75), inset 0 0 18px rgba(0,0,0,0.34);
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.war-sector span {
+  font-size: 0.58rem;
+  line-height: 1.05;
+  max-width: 76px;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.war-sector strong {
+  font-size: 0.78rem;
+}
+
+.war-facility {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--owner), transparent 12%);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--owner), transparent 60%);
+  height: 26px;
+  left: calc(var(--x) * 1%);
+  min-width: 0;
+  padding: 0;
+  pointer-events: auto;
+  position: absolute;
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%);
+  width: 26px;
+  z-index: 3;
+}
+
+.war-facility span {
+  border: 1px solid color-mix(in srgb, var(--owner), white 25%);
+  display: block;
+  height: 12px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+}
+
+.facility-power-plant span {
+  border-radius: 50%;
+}
+
+.facility-relay span {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.facility-foundry span {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.facility-shield-array {
+  border-radius: 50%;
+}
+
+.facility-data-vault span {
+  width: 16px;
+}
+
+.map-unit {
+  align-items: center;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--orange);
+  border-radius: 50%;
+  color: var(--text);
+  display: grid;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  height: 24px;
+  left: calc(var(--x) * 1%);
+  min-width: 0;
+  padding: 0;
+  place-items: center;
+  pointer-events: auto;
+  position: absolute;
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%);
+  width: 24px;
+  z-index: 4;
+}
+
+.map-unit.active {
+  animation: unitPulse 1.8s ease-in-out infinite;
+}
+
+.stance-assault {
+  border-color: var(--red);
+  box-shadow: 0 0 18px rgba(255,91,99,0.52);
+}
+
+.stance-defend {
+  border-color: var(--blue);
+  box-shadow: 0 0 18px rgba(140,165,255,0.52);
+}
+
+.stance-recon {
+  border-color: var(--green);
+  box-shadow: 0 0 18px rgba(120,245,165,0.52);
+}
+
+@keyframes unitPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.22); }
+}
+
+.sector-detail {
+  margin-top: 12px;
+}
+
+.unit-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wars-command-grid {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wars-command-grid label {
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+}
+
+.wars-command-grid button {
+  min-height: 45px;
+}
+
+.faction-card,
+.territory-card,
+.unit-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,157,46,0.18);
+  padding: 16px;
+}
+
+.faction-card {
+  border-color: color-mix(in srgb, var(--faction), transparent 50%);
+}
+
+.faction-card span,
+.territory-card span,
+.unit-card span,
+.unit-card small,
+.faction-card small,
+.territory-card small {
+  color: var(--muted);
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.faction-card strong,
+.territory-card strong,
+.unit-card strong {
+  display: block;
+  font-size: 1.25rem;
+  margin: 7px 0 10px;
+}
+
+.unit-card.active {
+  border-color: var(--green);
+  box-shadow: inset 0 0 28px rgba(120,245,165,0.08);
+}
+
+.unit-stats {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.unit-stats > div {
+  background: rgba(0,0,0,0.24);
+  padding: 8px;
+}
+
+.unit-stats span {
+  color: var(--dim);
+  font-size: 0.65rem;
+}
+
+.unit-stats strong {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
 .connect-experience::before {
   background:
     linear-gradient(90deg, transparent, rgba(255,157,46,0.16), transparent),
@@ -1035,6 +1396,7 @@ td small {
 @media (max-width: 1080px) {
   .hero-console,
   .connect-experience,
+  .hashwars-hero,
   .mission-grid {
     grid-template-columns: 1fr;
   }
@@ -1052,6 +1414,13 @@ td small {
   }
 
   .trust-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .faction-grid,
+  .territory-grid,
+  .unit-grid,
+  .wars-command-grid {
     grid-template-columns: 1fr;
   }
 }

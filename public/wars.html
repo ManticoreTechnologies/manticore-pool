@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hash Wars | Manticore EVR Pool</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body data-page="wars">
+  <div class="starscape" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="site-bar">
+    <a class="brand-lockup" href="/"><span class="brand-mark" aria-hidden="true"></span><span><strong>Manticore</strong><small>Technology</small></span></a>
+    <button class="menu-button" id="menu-button" type="button" aria-label="Pool menu" aria-expanded="false">☰</button>
+  </header>
+  <aside class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-panel">
+      <div class="nav-topline"><p class="eyebrow">// Navigation</p><button class="nav-close" id="nav-close" type="button" aria-label="Close menu">×</button></div>
+      <a href="/" class="nav-item"><span>01</span><strong>Pool Console</strong><small>Pool-wide telemetry.</small></a>
+      <a href="/connect" class="nav-item"><span>02</span><strong>Connect Rig</strong><small>Generate connection fields.</small></a>
+      <a href="/miner" class="nav-item"><span>03</span><strong>Miner Dashboard</strong><small>Workers and payouts.</small></a>
+      <a href="/wars" class="nav-item"><span>04</span><strong>Hash Wars</strong><small>Faction warfare powered by real hashrate.</small></a>
+      <a href="/proof" class="nav-item"><span>05</span><strong>Proof Trail</strong><small>Blocks and payouts.</small></a>
+    </div>
+  </aside>
+
+  <header class="command-header">
+    <div class="mission-title">
+      <p class="eyebrow">Manticore EVR / Hash Wars</p>
+      <h1><span>Hash</span> Wars</h1>
+      <p class="muted hero-statement">Workers become combat units. Factions fight for territory using real hashrate, shares, blocks, uptime, and efficiency.</p>
+    </div>
+    <div class="command-status">
+      <div class="status online" id="health">Connecting...</div>
+      <div class="mission-clock"><span>UTC</span><strong id="mission-time">--:--:--</strong></div>
+    </div>
+  </header>
+
+  <main class="mission-shell">
+    <nav class="tabs">
+      <a href="/">Pool Console</a>
+      <a href="/connect">Connect Rig</a>
+      <a href="/miner" id="miner-link">Miner Dashboard</a>
+      <a href="/wars">Hash Wars</a>
+      <a href="/proof">Proof Trail</a>
+    </nav>
+
+    <section class="hashwars-hero">
+      <div>
+        <p class="eyebrow">// Live Event</p>
+        <h2 id="wars-event-name">Boss Battle</h2>
+        <p class="muted" id="wars-event-description">Loading battle telemetry...</p>
+      </div>
+      <div class="boss-meter">
+        <span>Boss HP breached</span>
+        <strong id="wars-event-progress">0%</strong>
+        <div class="meter-track"><div id="wars-event-bar"></div></div>
+        <small id="wars-event-remaining">0 shares remaining</small>
+      </div>
+    </section>
+
+    <section class="grid cards">
+      <article class="telemetry-card"><span>Combat Units</span><strong id="wars-units">0</strong><small>Workers enlisted</small></article>
+      <article class="telemetry-card"><span>Active Units</span><strong id="wars-active-units">0</strong><small>Currently hashing</small></article>
+      <article class="telemetry-card"><span>War Hashrate</span><strong id="wars-hashrate">0 H/s</strong><small>Faction power</small></article>
+      <article class="telemetry-card"><span>Energy</span><strong id="wars-energy">0</strong><small>Valid-share charge</small></article>
+      <article class="telemetry-card"><span>Blocks</span><strong id="wars-blocks">0</strong><small>Nuclear events</small></article>
+    </section>
+
+    <section class="mission-grid">
+      <section class="panel mission-panel">
+        <div class="panel-header"><div><p class="panel-kicker">// Factions</p><h2>Faction command</h2><p class="muted">Influence is derived from hashrate, valid shares, blocks, uptime, and defense.</p></div></div>
+        <div id="wars-factions" class="faction-grid"></div>
+      </section>
+      <section class="panel mission-panel">
+        <div class="panel-header"><div><p class="panel-kicker">// Territory Map</p><h2>Sector control</h2><p class="muted">Click sectors to inspect control, anomaly, and buffs. The lattice changes every event.</p></div></div>
+        <div class="war-map" id="wars-map">
+          <svg id="wars-map-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <div id="wars-map-forests" class="war-forest-layer"></div>
+          <div id="wars-map-facilities" class="war-facility-layer"></div>
+          <div id="wars-map-units" class="war-unit-layer"></div>
+          <div id="wars-territories" class="war-sector-layer"></div>
+        </div>
+        <div id="wars-sector-detail" class="sector-detail"></div>
+      </section>
+    </section>
+
+    <section class="panel mission-panel">
+      <div class="panel-header">
+        <div><p class="panel-kicker">// Command Console</p><h2>Deploy a unit</h2><p class="muted">Choose a worker, rename its callsign, pick a faction, assign a sector, and set its combat stance.</p></div>
+      </div>
+      <div class="wars-command-grid">
+        <label>Worker<select id="wars-command-worker"></select></label>
+        <label>Callsign<input id="wars-command-callsign" placeholder="NecroNoncer"></label>
+        <label>Faction<select id="wars-command-faction"></select></label>
+        <label>Sector<select id="wars-command-territory"></select></label>
+        <label>Stance<select id="wars-command-stance"></select></label>
+        <button id="wars-command-save">Deploy unit</button>
+      </div>
+      <p class="muted console-message" id="wars-command-message">No fake power: deployments change where real mining telemetry applies pressure.</p>
+    </section>
+
+    <section class="panel mission-panel">
+      <div class="panel-header"><div><p class="panel-kicker">// Combat Roster</p><h2>Top rigs entering battle</h2><p class="muted">Scouts, gladiators, dreadnoughts, and titans ranked by real telemetry.</p></div></div>
+      <div id="wars-units-list" class="unit-grid"></div>
+    </section>
+
+    <section class="panel mission-panel">
+      <div class="panel-header"><div><p class="panel-kicker">// Battle Log</p><h2>Latest war events</h2><p class="muted">Territory flips and boss breaches generated from pool activity.</p></div></div>
+      <div id="wars-battle-log" class="list"></div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
