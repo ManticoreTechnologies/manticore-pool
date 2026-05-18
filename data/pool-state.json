@@ -1,0 +1,691 @@
+{
+  "startedAt": "2026-05-18T04:49:15.281Z",
+  "updatedAt": "2026-05-18T04:49:34.144Z",
+  "workers": {},
+  "addresses": {},
+  "hashWars": {
+    "season": {
+      "name": "Season 0: Genesis Skirmish",
+      "startedAt": 1779079774142,
+      "tick": 1
+    },
+    "lastTickAt": 1779079774142,
+    "eventStartValidShares": 0,
+    "eventTarget": 1000,
+    "eventIndex": 0,
+    "mapSeed": 1100332910,
+    "map": {
+      "seed": 1100332910,
+      "sectors": [
+        {
+          "id": "manticore-prime",
+          "name": "Manticore Prime",
+          "x": 80,
+          "y": 55,
+          "size": 22,
+          "anomaly": "rich"
+        },
+        {
+          "id": "evrmore-gate",
+          "name": "Evrmore Gate",
+          "x": 82,
+          "y": 80,
+          "size": 26,
+          "anomaly": "stable"
+        },
+        {
+          "id": "sentinel-belt",
+          "name": "Sentinel Belt",
+          "x": 49,
+          "y": 90,
+          "size": 25,
+          "anomaly": "rich"
+        },
+        {
+          "id": "peerweave-drift",
+          "name": "PeerWeave Drift",
+          "x": 23,
+          "y": 65,
+          "size": 16,
+          "anomaly": "dark"
+        },
+        {
+          "id": "glyph-arena",
+          "name": "Glyph Arena",
+          "x": 12,
+          "y": 49,
+          "size": 26,
+          "anomaly": "stable"
+        },
+        {
+          "id": "vault-nebula",
+          "name": "Vault Nebula",
+          "x": 8,
+          "y": 21,
+          "size": 11,
+          "anomaly": "stable"
+        },
+        {
+          "id": "null-expanse",
+          "name": "Null Expanse",
+          "x": 40,
+          "y": 29,
+          "size": 26,
+          "anomaly": "rich"
+        },
+        {
+          "id": "forge-moon",
+          "name": "Forge Moon",
+          "x": 68,
+          "y": 10,
+          "size": 18,
+          "anomaly": "volatile"
+        },
+        {
+          "id": "revenant-reach",
+          "name": "Revenant Reach",
+          "x": 92,
+          "y": 11,
+          "size": 20,
+          "anomaly": "rich"
+        }
+      ],
+      "links": [
+        {
+          "key": "evrmore-gate:manticore-prime",
+          "from": "manticore-prime",
+          "to": "evrmore-gate"
+        },
+        {
+          "key": "manticore-prime:revenant-reach",
+          "from": "manticore-prime",
+          "to": "revenant-reach"
+        },
+        {
+          "key": "forge-moon:manticore-prime",
+          "from": "manticore-prime",
+          "to": "forge-moon"
+        },
+        {
+          "key": "evrmore-gate:sentinel-belt",
+          "from": "evrmore-gate",
+          "to": "sentinel-belt"
+        },
+        {
+          "key": "peerweave-drift:sentinel-belt",
+          "from": "sentinel-belt",
+          "to": "peerweave-drift"
+        },
+        {
+          "key": "manticore-prime:sentinel-belt",
+          "from": "sentinel-belt",
+          "to": "manticore-prime"
+        },
+        {
+          "key": "glyph-arena:peerweave-drift",
+          "from": "peerweave-drift",
+          "to": "glyph-arena"
+        },
+        {
+          "key": "glyph-arena:vault-nebula",
+          "from": "glyph-arena",
+          "to": "vault-nebula"
+        },
+        {
+          "key": "glyph-arena:null-expanse",
+          "from": "glyph-arena",
+          "to": "null-expanse"
+        },
+        {
+          "key": "null-expanse:vault-nebula",
+          "from": "vault-nebula",
+          "to": "null-expanse"
+        },
+        {
+          "key": "forge-moon:null-expanse",
+          "from": "null-expanse",
+          "to": "forge-moon"
+        },
+        {
+          "key": "forge-moon:revenant-reach",
+          "from": "forge-moon",
+          "to": "revenant-reach"
+        },
+        {
+          "key": "null-expanse:revenant-reach",
+          "from": "revenant-reach",
+          "to": "null-expanse"
+        }
+      ],
+      "facilities": [
+        {
+          "id": "manticore-prime-power-plant",
+          "sectorId": "manticore-prime",
+          "type": "power-plant",
+          "name": "Power Plant",
+          "bonus": "+Energy output",
+          "x": 76,
+          "y": 54
+        },
+        {
+          "id": "evrmore-gate-relay",
+          "sectorId": "evrmore-gate",
+          "type": "relay",
+          "name": "Relay Tower",
+          "bonus": "+Recon pressure",
+          "x": 85,
+          "y": 85
+        },
+        {
+          "id": "sentinel-belt-foundry",
+          "sectorId": "sentinel-belt",
+          "type": "foundry",
+          "name": "Foundry",
+          "bonus": "+Assault output",
+          "x": 47,
+          "y": 92
+        },
+        {
+          "id": "peerweave-drift-shield-array",
+          "sectorId": "peerweave-drift",
+          "type": "shield-array",
+          "name": "Shield Array",
+          "bonus": "+Defense",
+          "x": 24,
+          "y": 69
+        },
+        {
+          "id": "glyph-arena-data-vault",
+          "sectorId": "glyph-arena",
+          "type": "data-vault",
+          "name": "Data Vault",
+          "bonus": "+XP gain",
+          "x": 15,
+          "y": 49
+        },
+        {
+          "id": "vault-nebula-power-plant",
+          "sectorId": "vault-nebula",
+          "type": "power-plant",
+          "name": "Power Plant",
+          "bonus": "+Energy output",
+          "x": 5,
+          "y": 19
+        },
+        {
+          "id": "null-expanse-relay",
+          "sectorId": "null-expanse",
+          "type": "relay",
+          "name": "Relay Tower",
+          "bonus": "+Recon pressure",
+          "x": 36,
+          "y": 27
+        },
+        {
+          "id": "forge-moon-foundry",
+          "sectorId": "forge-moon",
+          "type": "foundry",
+          "name": "Foundry",
+          "bonus": "+Assault output",
+          "x": 65,
+          "y": 10
+        },
+        {
+          "id": "revenant-reach-shield-array",
+          "sectorId": "revenant-reach",
+          "type": "shield-array",
+          "name": "Shield Array",
+          "bonus": "+Defense",
+          "x": 94,
+          "y": 12
+        }
+      ],
+      "forests": [
+        {
+          "id": "forest-0",
+          "x": 61,
+          "y": 19,
+          "size": 9,
+          "density": 3
+        },
+        {
+          "id": "forest-1",
+          "x": 83,
+          "y": 54,
+          "size": 7,
+          "density": 3
+        },
+        {
+          "id": "forest-2",
+          "x": 92,
+          "y": 54,
+          "size": 17,
+          "density": 7
+        },
+        {
+          "id": "forest-3",
+          "x": 10,
+          "y": 92,
+          "size": 9,
+          "density": 3
+        },
+        {
+          "id": "forest-4",
+          "x": 42,
+          "y": 58,
+          "size": 8,
+          "density": 6
+        },
+        {
+          "id": "forest-5",
+          "x": 33,
+          "y": 42,
+          "size": 11,
+          "density": 6
+        },
+        {
+          "id": "forest-6",
+          "x": 42,
+          "y": 68,
+          "size": 17,
+          "density": 3
+        },
+        {
+          "id": "forest-7",
+          "x": 97,
+          "y": 69,
+          "size": 12,
+          "density": 4
+        },
+        {
+          "id": "forest-8",
+          "x": 70,
+          "y": 52,
+          "size": 13,
+          "density": 6
+        },
+        {
+          "id": "forest-9",
+          "x": 94,
+          "y": 91,
+          "size": 7,
+          "density": 3
+        },
+        {
+          "id": "forest-10",
+          "x": 58,
+          "y": 87,
+          "size": 7,
+          "density": 3
+        },
+        {
+          "id": "forest-11",
+          "x": 3,
+          "y": 44,
+          "size": 13,
+          "density": 5
+        },
+        {
+          "id": "forest-12",
+          "x": 90,
+          "y": 67,
+          "size": 14,
+          "density": 2
+        },
+        {
+          "id": "forest-13",
+          "x": 28,
+          "y": 23,
+          "size": 15,
+          "density": 7
+        },
+        {
+          "id": "forest-14",
+          "x": 75,
+          "y": 31,
+          "size": 11,
+          "density": 4
+        },
+        {
+          "id": "forest-15",
+          "x": 57,
+          "y": 15,
+          "size": 14,
+          "density": 4
+        },
+        {
+          "id": "forest-16",
+          "x": 52,
+          "y": 81,
+          "size": 15,
+          "density": 2
+        },
+        {
+          "id": "forest-17",
+          "x": 11,
+          "y": 28,
+          "size": 7,
+          "density": 5
+        },
+        {
+          "id": "forest-18",
+          "x": 88,
+          "y": 51,
+          "size": 16,
+          "density": 3
+        },
+        {
+          "id": "forest-19",
+          "x": 58,
+          "y": 62,
+          "size": 17,
+          "density": 2
+        },
+        {
+          "id": "forest-20",
+          "x": 56,
+          "y": 47,
+          "size": 14,
+          "density": 2
+        },
+        {
+          "id": "forest-21",
+          "x": 48,
+          "y": 57,
+          "size": 14,
+          "density": 4
+        },
+        {
+          "id": "forest-22",
+          "x": 15,
+          "y": 31,
+          "size": 9,
+          "density": 3
+        },
+        {
+          "id": "forest-23",
+          "x": 89,
+          "y": 7,
+          "size": 13,
+          "density": 5
+        },
+        {
+          "id": "forest-24",
+          "x": 91,
+          "y": 43,
+          "size": 13,
+          "density": 4
+        },
+        {
+          "id": "forest-25",
+          "x": 47,
+          "y": 70,
+          "size": 11,
+          "density": 6
+        },
+        {
+          "id": "forest-26",
+          "x": 25,
+          "y": 41,
+          "size": 8,
+          "density": 6
+        },
+        {
+          "id": "forest-27",
+          "x": 28,
+          "y": 43,
+          "size": 12,
+          "density": 2
+        },
+        {
+          "id": "forest-28",
+          "x": 13,
+          "y": 85,
+          "size": 11,
+          "density": 7
+        },
+        {
+          "id": "forest-29",
+          "x": 80,
+          "y": 38,
+          "size": 10,
+          "density": 4
+        },
+        {
+          "id": "forest-30",
+          "x": 34,
+          "y": 60,
+          "size": 9,
+          "density": 3
+        },
+        {
+          "id": "forest-31",
+          "x": 18,
+          "y": 6,
+          "size": 7,
+          "density": 5
+        },
+        {
+          "id": "forest-32",
+          "x": 8,
+          "y": 27,
+          "size": 10,
+          "density": 3
+        },
+        {
+          "id": "forest-33",
+          "x": 39,
+          "y": 66,
+          "size": 17,
+          "density": 3
+        }
+      ]
+    },
+    "territories": [
+      {
+        "id": "manticore-prime",
+        "name": "Manticore Prime",
+        "owner": "forge",
+        "control": {
+          "forge": 53.5,
+          "revenants": 8.5,
+          "iron-legion": 8.5,
+          "null-syndicate": 8.5,
+          "ghost-grid": 8.5
+        },
+        "buff": "+1% XP",
+        "pressure": {
+          "forge": 0,
+          "revenants": 0,
+          "iron-legion": 0,
+          "null-syndicate": 0,
+          "ghost-grid": 0
+        },
+        "status": "controlled"
+      },
+      {
+        "id": "evrmore-gate",
+        "name": "Evrmore Gate",
+        "owner": "revenants",
+        "control": {
+          "forge": 8.5,
+          "revenants": 53.5,
+          "iron-legion": 8.5,
+          "null-syndicate": 8.5,
+          "ghost-grid": 8.5
+        },
+        "buff": "+1% shield",
+        "pressure": {
+          "forge": 0,
+          "revenants": 0,
+          "iron-legion": 0,
+          "null-syndicate": 0,
+          "ghost-grid": 0
+        },
+        "status": "controlled"
+      },
+      {
+        "id": "sentinel-belt",
+        "name": "Sentinel Belt",
+        "owner": "iron-legion",
+        "control": {
+          "forge": 8.5,
+          "revenants": 8.5,
+          "iron-legion": 53.5,
+          "null-syndicate": 8.5,
+          "ghost-grid": 8.5
+        },
+        "buff": "+1% energy",
+        "pressure": {
+          "forge": 0,
+          "revenants": 0,
+          "iron-legion": 0,
+          "null-syndicate": 0,
+          "ghost-grid": 0
+        },
+        "status": "controlled"
+      },
+      {
+        "id": "peerweave-drift",
+        "name": "PeerWeave Drift",
+        "owner": "null-syndicate",
+        "control": {
+          "forge": 8.5,
+          "revenants": 8.5,
+          "iron-legion": 8.5,
+          "null-syndicate": 53.5,
+          "ghost-grid": 8.5
+        },
+        "buff": "+1% XP",
+        "pressure": {
+          "forge": 0,
+          "revenants": 0,
+          "iron-legion": 0,
+          "null-syndicate": 0,
+          "ghost-grid": 0
+        },
+        "status": "controlled"
+      },
+      {
+        "id": "glyph-arena",
+        "name": "Glyph Arena",
+        "owner": "ghost-grid",
+        "control": {
+          "forge": 8.5,
+          "revenants": 8.5,
+          "iron-legion": 8.5,
+          "null-syndicate": 8.5,
+          "ghost-grid": 53.5
+        },
+        "buff": "+1% shield",
+        "pressure": {
+          "forge": 0,
+          "revenants": 0,
+          "iron-legion": 0,
+          "null-syndicate": 0,
+          "ghost-grid": 0
+        },
+        "status": "controlled"
+      },
+      {
+        "id": "vault-nebula",
+        "name": "Vault Nebula",
+        "owner": "forge",
+        "control": {
+          "forge": 53.5,
+          "revenants": 8.5,
+          "iron-legion": 8.5,
+          "null-syndicate": 8.5,
+          "ghost-grid": 8.5
+        },
+        "buff": "+1% energy",
+        "pressure": {
+          "forge": 0,
+          "revenants": 0,
+          "iron-legion": 0,
+          "null-syndicate": 0,
+          "ghost-grid": 0
+        },
+        "status": "controlled"
+      },
+      {
+        "id": "null-expanse",
+        "name": "Null Expanse",
+        "owner": "revenants",
+        "control": {
+          "forge": 8.5,
+          "revenants": 53.5,
+          "iron-legion": 8.5,
+          "null-syndicate": 8.5,
+          "ghost-grid": 8.5
+        },
+        "buff": "+1% XP",
+        "pressure": {
+          "forge": 0,
+          "revenants": 0,
+          "iron-legion": 0,
+          "null-syndicate": 0,
+          "ghost-grid": 0
+        },
+        "status": "controlled"
+      },
+      {
+        "id": "forge-moon",
+        "name": "Forge Moon",
+        "owner": "iron-legion",
+        "control": {
+          "forge": 8.5,
+          "revenants": 8.5,
+          "iron-legion": 53.5,
+          "null-syndicate": 8.5,
+          "ghost-grid": 8.5
+        },
+        "buff": "+1% shield",
+        "pressure": {
+          "forge": 0,
+          "revenants": 0,
+          "iron-legion": 0,
+          "null-syndicate": 0,
+          "ghost-grid": 0
+        },
+        "status": "controlled"
+      },
+      {
+        "id": "revenant-reach",
+        "name": "Revenant Reach",
+        "owner": "null-syndicate",
+        "control": {
+          "forge": 8.5,
+          "revenants": 8.5,
+          "iron-legion": 8.5,
+          "null-syndicate": 53.5,
+          "ghost-grid": 8.5
+        },
+        "buff": "+1% energy",
+        "pressure": {
+          "forge": 0,
+          "revenants": 0,
+          "iron-legion": 0,
+          "null-syndicate": 0,
+          "ghost-grid": 0
+        },
+        "status": "controlled"
+      }
+    ],
+    "battleLog": []
+  },
+  "shares": [],
+  "blocks": [],
+  "payouts": [],
+  "networkHistory": [],
+  "pool": {
+    "validShares": 0,
+    "invalidShares": 0,
+    "totalShares": 0,
+    "totalBlocks": 0,
+    "totalRewards": 0,
+    "unpaid": 0,
+    "paid": 0,
+    "accruedFees": 0
+  }
+}

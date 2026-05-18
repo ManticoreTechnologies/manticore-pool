@@ -222,146 +222,123 @@ function renderMiner(summary) {
   }
 }
 
+var warfield = null;
+var lastWarsState = null;
+
+function initWarfield() {
+  if (warfield) return;
+  var canvas = byId('war-canvas');
+  if (!canvas || typeof Warfield === 'undefined') return;
+  warfield = new Warfield(canvas);
+  warfield.onSectorSelect = function(sector) {
+    if (lastWarsState) renderSectorDetail(sector, lastWarsState);
+  };
+  warfield.start();
+}
+
 function renderHashWars(state) {
-  if (!byId('wars-event-name')) {
-    return;
-  }
+  if (!byId('wars-event-name')) return;
+  lastWarsState = state;
+
+  initWarfield();
+  if (warfield) warfield.updateState(state);
 
   setText('wars-event-name', state.event.name);
-  setText('wars-event-description', state.event.description);
   setText('wars-event-progress', state.event.progress + '%');
-  setText('wars-event-remaining', state.event.remaining + ' valid shares remaining');
   if (byId('wars-event-bar')) {
     byId('wars-event-bar').style.width = state.event.progress + '%';
   }
   setText('wars-units', state.totals.units);
   setText('wars-active-units', state.totals.activeUnits);
   setText('wars-hashrate', formatHashrate(state.totals.hashrate));
-  setText('wars-energy', state.totals.energy.toLocaleString());
-  setText('wars-blocks', state.totals.blocks);
+  setText('wars-energy', Math.round(state.totals.pressure || state.totals.energy).toLocaleString());
 
-  var factions = byId('wars-factions');
-  factions.innerHTML = state.factions.map(function(faction) {
-    return '<article class="faction-card" style="--faction:' + escapeHtml(faction.color) + '">' +
-      '<span>' + escapeHtml(faction.motto) + '</span>' +
-      '<strong>' + escapeHtml(faction.name) + '</strong>' +
-      '<div class="meter-track"><div style="width:' + faction.influence + '%"></div></div>' +
-      '<small>' + formatHashrate(faction.hashrate) + ' | ' + faction.activeUnits + ' active | ' + faction.influence + '% influence</small>' +
-      '</article>';
-  }).join('');
-
-  renderWarMap(state);
-
-  var units = byId('wars-units-list');
-  units.innerHTML = state.units.length ? state.units.map(function(unit) {
-    return '<article class="unit-card ' + (unit.active ? 'active' : '') + '">' +
-      '<span>LVL ' + unit.level + ' ' + escapeHtml(unit.className) + ' / ' + escapeHtml(unit.factionName) + '</span>' +
-      '<strong>' + escapeHtml(unit.callsign) + '</strong>' +
-      '<small>' + escapeHtml(unit.workername) + ' | ' + escapeHtml(unit.territory) + ' | ' + escapeHtml(unit.stance) + ' | ' + escapeHtml(unit.archetype) + '</small>' +
-      '<div class="unit-stats">' +
-      '<div><span>ATK</span><strong>' + unit.attack + '</strong></div>' +
-      '<div><span>SHD</span><strong>' + unit.shield + '</strong></div>' +
-      '<div><span>ENG</span><strong>' + unit.energy + '</strong></div>' +
-      '<div><span>EFF</span><strong>' + Math.round(unit.efficiency * 100) + '%</strong></div>' +
-      '</div>' +
-      '</article>';
-  }).join('') : '<p class="empty">No combat units enlisted yet. Connect a miner to enter the war.</p>';
-
+  renderWarFactionBar(state);
+  renderWarUnits(state);
   renderWarsCommand(state);
   renderWarsBattleLog(state.battleLog || []);
+  renderWarNetworkAlerts(state.networkEvents || []);
 }
 
-function renderWarMap(state) {
-  var layer = byId('wars-territories');
-  if (!layer) return;
-  var links = byId('wars-map-links');
-  links.innerHTML = (state.map.links || []).map(function(link) {
-    return '<line x1="' + link.x1 + '" y1="' + link.y1 + '" x2="' + link.x2 + '" y2="' + link.y2 + '"></line>';
+function renderWarFactionBar(state) {
+  var bar = byId('war-faction-bar');
+  if (!bar) return;
+  bar.innerHTML = state.factions.map(function(faction) {
+    return '<div class="war-faction-strip" style="--fc:' + escapeHtml(faction.color) + '">' +
+      '<span class="war-faction-name">' + escapeHtml(faction.name) + '</span>' +
+      '<span class="war-faction-inf">' + faction.influence + '%</span>' +
+      '<div class="war-faction-meter"><div class="war-faction-meter-fill" style="width:' + faction.influence + '%"></div></div>' +
+      '<span class="war-faction-terr">' + (faction.territoriesOwned || 0) + ' sectors / ' + faction.activeUnits + ' active</span>' +
+      '</div>';
   }).join('');
-
-  var forests = byId('wars-map-forests');
-  if (forests) {
-    forests.innerHTML = (state.map.forests || []).map(function(forest) {
-      return '<span class="war-forest" style="--x:' + forest.x + ';--y:' + forest.y + ';--size:' + forest.size + ';--density:' + forest.density + '"></span>';
-    }).join('');
-  }
-
-  var facilities = byId('wars-map-facilities');
-  if (facilities) {
-    facilities.innerHTML = (state.map.facilities || []).map(function(facility) {
-      return '<button class="war-facility facility-' + escapeHtml(facility.type) + '" data-sector="' + escapeHtml(facility.sectorId) + '" title="' + escapeHtml(facility.name + ' - ' + facility.bonus) + '" style="--x:' + facility.x + ';--y:' + facility.y + ';--owner:' + escapeHtml(facility.ownerColor) + '">' +
-        '<span></span>' +
-        '</button>';
-    }).join('');
-  }
-
-  var mapUnits = byId('wars-map-units');
-  if (mapUnits) {
-    mapUnits.innerHTML = (state.mapUnits || []).map(function(unit) {
-      return '<button class="map-unit stance-' + escapeHtml(unit.stance) + ' ' + (unit.active ? 'active' : '') + '" data-worker="' + escapeHtml(unit.workername) + '" title="' + escapeHtml(unit.callsign + ' / ' + unit.className) + '" style="--x:' + unit.x + ';--y:' + unit.y + '">' +
-        '<span>' + escapeHtml(unit.callsign.slice(0, 2).toUpperCase()) + '</span>' +
-        '</button>';
-    }).join('');
-  }
-
-  var selected = layer.getAttribute('data-selected') || (state.territories[0] && state.territories[0].id);
-  layer.innerHTML = state.territories.map(function(territory) {
-    var active = territory.id === selected ? ' selected' : '';
-    return '<button class="war-sector' + active + '" data-sector="' + escapeHtml(territory.id) + '" style="--x:' + territory.x + ';--y:' + territory.y + ';--size:' + territory.size + ';--owner:' + escapeHtml(territory.ownerColor) + '">' +
-      '<span>' + escapeHtml(territory.name) + '</span>' +
-      '<strong>' + territory.control + '%</strong>' +
-      '</button>';
-  }).join('');
-
-  Array.prototype.forEach.call(layer.querySelectorAll('.war-sector'), function(button) {
-    button.addEventListener('click', function() {
-      layer.setAttribute('data-selected', button.getAttribute('data-sector'));
-      renderWarMap(state);
-    });
-  });
-  Array.prototype.forEach.call(document.querySelectorAll('.war-facility'), function(button) {
-    button.addEventListener('click', function() {
-      layer.setAttribute('data-selected', button.getAttribute('data-sector'));
-      renderWarMap(state);
-    });
-  });
-
-  var detail = state.territories.find(function(territory) { return territory.id === selected; }) || state.territories[0];
-  var sectorFacilities = (state.map.facilities || []).filter(function(facility) { return facility.sectorId === (detail && detail.id); });
-  var sectorUnits = (state.mapUnits || []).filter(function(unit) { return detail && unit.territory === detail.name; });
-  renderSectorDetail(detail, sectorFacilities, sectorUnits);
 }
 
-function renderSectorDetail(territory, facilities, units) {
+function renderSectorDetail(sector, state) {
   var container = byId('wars-sector-detail');
-  if (!container || !territory) return;
-  var facilityText = facilities && facilities.length
-    ? facilities.map(function(facility) { return facility.name + ' (' + facility.bonus + ')'; }).join(' | ')
-    : 'No facilities';
-  var unitText = units && units.length
-    ? units.map(function(unit) { return unit.callsign + ' [' + unit.stance + ']'; }).join(' | ')
-    : 'No deployed units';
-  container.innerHTML = '<article class="territory-card">' +
-    '<span>' + escapeHtml(territory.status) + ' / ' + escapeHtml(territory.anomaly) + '</span>' +
-    '<strong>' + escapeHtml(territory.name) + '</strong>' +
-    '<small>' + escapeHtml(territory.ownerName) + ' control: ' + territory.control + '% | ' + escapeHtml(territory.buff) + '</small>' +
-    '<small>Facilities: ' + escapeHtml(facilityText) + '</small>' +
-    '<small>Units: ' + escapeHtml(unitText) + '</small>' +
-    '</article>';
+  if (!container || !sector) return;
+  state = state || lastWarsState;
+  var factions = (state && state.constants && state.constants.factions) || [];
+  var controlMap = sector.controlMap || {};
+  var barsHtml = factions.map(function(f) {
+    var val = controlMap[f.id] || 0;
+    return '<div class="war-intel-bar">' +
+      '<span class="war-intel-bar-label" style="color:' + escapeHtml(f.color) + '">' + escapeHtml(f.name.slice(0, 3)) + '</span>' +
+      '<div class="war-intel-bar-track"><div class="war-intel-bar-fill" style="width:' + val + '%;background:' + escapeHtml(f.color) + '"></div></div>' +
+      '<span class="war-intel-bar-val">' + val + '%</span>' +
+      '</div>';
+  }).join('');
+
+  var sectorFacilities = state && state.map && state.map.facilities
+    ? state.map.facilities.filter(function(f) { return f.sectorId === sector.id; })
+    : [];
+  var facText = sectorFacilities.map(function(f) { return f.name; }).join(', ') || 'None';
+
+  container.innerHTML = '<div class="war-intel-card">' +
+    '<div class="war-intel-name">' + escapeHtml(sector.name) + '</div>' +
+    '<div class="war-intel-owner" style="color:' + escapeHtml(sector.ownerColor) + '">' +
+      escapeHtml(sector.ownerName) + ' control &mdash; ' + escapeHtml(sector.status) +
+    '</div>' +
+    '<div class="war-intel-bars">' + barsHtml + '</div>' +
+    '<div class="war-intel-meta">Momentum: ' + (sector.momentum || 0) + '% | ' + escapeHtml(sector.anomaly || 'stable') +
+    ' | ' + escapeHtml(sector.buff || '') + '<br>Facilities: ' + escapeHtml(facText) + '</div>' +
+    '</div>';
+}
+
+function renderWarUnits(state) {
+  var container = byId('wars-units-list');
+  if (!container) return;
+  var units = state.units || [];
+  if (!units.length) {
+    container.innerHTML = '<p class="war-muted">No units enlisted. Connect a miner.</p>';
+    return;
+  }
+  container.innerHTML = units.slice(0, 12).map(function(unit) {
+    var fc = state.factions.find(function(f) { return f.id === unit.faction; });
+    var color = fc ? fc.color : '#ff9d2e';
+    return '<div class="war-unit-chip ' + (unit.active ? 'active' : '') + '">' +
+      '<div class="war-unit-icon" style="border-color:' + escapeHtml(color) + '">' +
+        escapeHtml(unit.callsign.slice(0, 2).toUpperCase()) +
+      '</div>' +
+      '<div class="war-unit-info">' +
+        '<div class="war-unit-callsign">' + escapeHtml(unit.callsign) + '</div>' +
+        '<div class="war-unit-meta">L' + unit.level + ' ' + escapeHtml(unit.className) + ' / ' + escapeHtml(unit.archetype) + ' / ' + escapeHtml(unit.stance) + '</div>' +
+      '</div>' +
+      '<div class="war-unit-stats-mini">' +
+        '<div><span>ATK</span><strong>' + unit.attack + '</strong></div>' +
+        '<div><span>SHD</span><strong>' + unit.shield + '</strong></div>' +
+      '</div>' +
+      '</div>';
+  }).join('');
 }
 
 function renderWarsCommand(state) {
-  if (!byId('wars-command-worker')) {
-    return;
-  }
+  if (!byId('wars-command-worker')) return;
 
   var selected = byId('wars-command-worker').value;
   byId('wars-command-worker').innerHTML = state.units.map(function(unit) {
     return '<option value="' + escapeHtml(unit.workername) + '">' + escapeHtml(unit.callsign) + ' (' + escapeHtml(unit.className) + ')</option>';
   }).join('');
-  if (selected) {
-    byId('wars-command-worker').value = selected;
-  }
+  if (selected) byId('wars-command-worker').value = selected;
 
   byId('wars-command-faction').innerHTML = state.constants.factions.map(function(faction) {
     return '<option value="' + escapeHtml(faction.id) + '">' + escapeHtml(faction.name) + '</option>';
@@ -385,16 +362,33 @@ function renderWarsCommand(state) {
 
 function renderWarsBattleLog(log) {
   var container = byId('wars-battle-log');
-  if (!container) {
-    return;
-  }
+  if (!container) return;
   if (!log.length) {
-    container.innerHTML = '<p class="empty">No war events logged yet. Keep hashing.</p>';
+    container.innerHTML = '<p class="war-muted">No war events yet. Keep hashing.</p>';
     return;
   }
-  container.innerHTML = log.slice(0, 12).map(function(entry) {
-    return '<article class="list-item"><strong>' + escapeHtml(entry.type) + '</strong><span>' + escapeHtml(entry.message) + '</span><small>' + new Date(entry.timestamp).toLocaleString() + '</small></article>';
+  container.innerHTML = log.slice(0, 10).map(function(entry) {
+    return '<div class="war-log-entry" data-type="' + escapeHtml(entry.type) + '">' +
+      '<strong>' + escapeHtml(entry.type.replace(/_/g, ' ')) + '</strong>' +
+      '<span>' + escapeHtml(entry.message) + '</span>' +
+      '<small>' + new Date(entry.timestamp).toLocaleTimeString() + '</small>' +
+      '</div>';
   }).join('');
+}
+
+function renderWarNetworkAlerts(events) {
+  var container = byId('war-network-alert');
+  if (!container) return;
+  if (!events || !events.length) {
+    container.innerHTML = '';
+    return;
+  }
+  var evt = events[0];
+  var severity = evt.type === 'difficulty_spike' ? 'high'
+    : evt.type === 'block_found' ? 'low'
+    : 'medium';
+  container.innerHTML = '<div class="war-alert-pill" data-severity="' + severity + '">' +
+    escapeHtml(evt.message) + '</div>';
 }
 
 async function refresh() {
@@ -624,11 +618,23 @@ if (byId('wars-command-save')) {
         territory: byId('wars-command-territory').value,
         stance: byId('wars-command-stance').value
       });
-      setText('wars-command-message', 'Deployment updated. Territory pressure will apply on the next war tick.');
+      setText('wars-command-message', 'Deployed. Pressure applies next tick.');
       refresh();
     } catch (error) {
-      setText('wars-command-message', 'Deployment failed: ' + error.message);
+      setText('wars-command-message', 'Deploy failed: ' + error.message);
     }
+  });
+}
+if (byId('war-toggle-sidebar')) {
+  byId('war-toggle-sidebar').addEventListener('click', function() {
+    var sb = byId('war-sidebar');
+    if (sb) sb.classList.toggle('collapsed');
+  });
+}
+if (byId('war-close-sidebar')) {
+  byId('war-close-sidebar').addEventListener('click', function() {
+    var sb = byId('war-sidebar');
+    if (sb) sb.classList.add('collapsed');
   });
 }
 
