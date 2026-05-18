@@ -11,11 +11,22 @@
   <div class="grid-overlay" aria-hidden="true"></div>
   <div class="scanline" aria-hidden="true"></div>
 
+  <header class="site-bar">
+    <a class="brand-lockup" href="/">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>Manticore</strong>
+        <small>Technology</small>
+      </span>
+    </a>
+    <button class="menu-button" type="button" aria-label="Pool menu">☰</button>
+  </header>
+
   <header class="command-header">
     <div class="mission-title">
-      <p class="eyebrow">Manticore EVR / Orbital Pool Array</p>
-      <h1>Mission Control</h1>
-      <p class="muted">Live telemetry for stratum, miners, payouts, blocks, and Evrmore network operations.</p>
+      <p class="eyebrow">Manticore EVR / Proof-of-Work Operations</p>
+      <h1><span>Manticore</span> Pool</h1>
+      <p class="muted hero-statement">Verifiable mining infrastructure for the Evrmore ecosystem: live stratum telemetry, signed payout accounting, and operational evidence you can inspect.</p>
     </div>
 
     <div class="command-status">
@@ -29,8 +40,9 @@
 
   <main class="mission-shell">
     <nav class="tabs">
-      <a href="/" id="home-link">Command Deck</a>
-      <a href="#" id="miner-link">Miner Bay</a>
+      <a href="/" id="home-link">Pool Console</a>
+      <a href="#" id="miner-link">Miner Dashboard</a>
+      <a href="/api/payouts">Payout Ledger</a>
     </nav>
 
     <section class="hero-console">
@@ -39,18 +51,37 @@
         <div class="orbital-ring ring-two"></div>
         <div class="orbital-center">
           <span>EVR</span>
-          <strong>POOL</strong>
+          <strong>TRUST</strong>
         </div>
       </div>
       <div class="console-copy">
-        <p class="eyebrow">Operational Overview</p>
-        <h2>Mining telemetry online</h2>
-        <p class="muted">Signal lock, payout ledger, worker manifest, and network radar are synchronized from this pool instance.</p>
+        <p class="eyebrow">// Mining Surface</p>
+        <h2>Systems that prove themselves</h2>
+        <p class="muted">Signal lock, payout ledger, worker manifest, and network radar are synchronized from this pool instance. Trust comes from traceable state, not a tagline.</p>
+        <div class="hero-actions">
+          <a href="#miner-panel">Miner console</a>
+          <a href="#blocks">Proof trail</a>
+        </div>
       </div>
       <div class="signal-stack">
         <div><span>Stratum</span><strong id="stratum-signal">3333 / 3334</strong></div>
         <div><span>Auto Payouts</span><strong id="payout-mode">Standby</strong></div>
-        <div><span>Refresh Cycle</span><strong>15 sec</strong></div>
+        <div><span>Build Posture</span><strong>Shipping</strong></div>
+      </div>
+    </section>
+
+    <section class="trust-strip">
+      <div>
+        <span>// Pillar 1</span>
+        <strong>Proof over promise</strong>
+      </div>
+      <div>
+        <span>// Pillar 2</span>
+        <strong>Deterministic payouts</strong>
+      </div>
+      <div>
+        <span>// Pillar 3</span>
+        <strong>Local-first state</strong>
       </div>
     </section>
 
@@ -86,7 +117,7 @@
       <section class="panel mission-panel network-panel">
         <div class="panel-header">
           <div>
-            <p class="panel-kicker">Network Radar</p>
+            <p class="panel-kicker">// Network Radar</p>
             <h2>Evrmore link status</h2>
             <p class="muted">Connected core-node telemetry and pool network share.</p>
           </div>
@@ -101,9 +132,9 @@
       </section>
 
       <aside class="panel mission-panel uplink-panel">
-        <p class="panel-kicker">Mission Links</p>
+        <p class="panel-kicker">// Address Uplink</p>
         <h2>Address uplink</h2>
-        <p class="muted">Enter a payout address or open <code>/dashboard/E...</code> for a miner-specific command view.</p>
+        <p class="muted">Enter a payout address or open <code>/dashboard/E...</code> for a miner-specific command view with payout controls.</p>
         <input id="address-filter" placeholder="Filter by payout address">
         <div class="uplink-readout">
           <span>Selected address</span>
@@ -115,7 +146,7 @@
     <section class="panel mission-panel" id="miner-panel">
       <div class="panel-header">
         <div>
-          <p class="panel-kicker">Miner Bay</p>
+          <p class="panel-kicker">// Miner Bay</p>
           <h2>Per-address command console</h2>
           <p class="muted">Worker manifest, payout balance, manual payout, and automatic payout settings.</p>
         </div>
@@ -147,7 +178,7 @@
     <section class="panel mission-panel">
       <div class="panel-header">
         <div>
-          <p class="panel-kicker">Worker Manifest</p>
+          <p class="panel-kicker">// Worker Manifest</p>
           <h2>Rig telemetry</h2>
           <p class="muted">All workers for the pool or selected payout address.</p>
         </div>
@@ -174,7 +205,7 @@
       <section class="panel mission-panel">
         <div class="panel-header">
           <div>
-            <p class="panel-kicker">Block Radar</p>
+            <p class="panel-kicker">// Block Radar</p>
             <h2>Recent block candidates</h2>
             <p class="muted">Submitted candidates, reward accounting, and maturity status.</p>
           </div>
@@ -185,7 +216,7 @@
       <section class="panel mission-panel">
         <div class="panel-header">
           <div>
-            <p class="panel-kicker">Payout Ledger</p>
+            <p class="panel-kicker">// Payout Ledger</p>
             <h2>Recent payouts</h2>
             <p class="muted">Wallet transactions sent by the payout worker.</p>
           </div>
