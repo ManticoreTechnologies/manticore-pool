@@ -718,5 +718,118 @@
     if (this.eventFlash < 0.01) this.eventFlash = 0;
   };
 
+  Warfield.prototype.injectShare = function(shareEvent) {
+    if (!this.state || !shareEvent.territory) return;
+    var territories = this.state.territories || [];
+    var t = territories.find(function(tt) { return tt.name === shareEvent.territory; });
+    if (!t) return;
+    var w = this.width || 800;
+    var h = this.height || 600;
+    var tx = t.x * w / 100;
+    var ty = t.y * h / 100;
+    var fc = (this.state.factions || []).find(function(f) { return f.id === shareEvent.faction; });
+    var color = fc ? hexToRgb(fc.color) : { r: 255, g: 157, b: 46 };
+    this.pressureWaves.push({
+      x: tx + (Math.random() - 0.5) * 20,
+      y: ty + (Math.random() - 0.5) * 20,
+      radius: 0,
+      maxRadius: shareEvent.valid ? 40 : 15,
+      speed: shareEvent.valid ? 0.8 : 0.4,
+      color: shareEvent.valid ? color : { r: 255, g: 91, b: 99 },
+      alpha: shareEvent.valid ? 0.45 : 0.2
+    });
+    if (shareEvent.valid) {
+      if (!this.territoryPulses) this.territoryPulses = {};
+      this.territoryPulses[t.id] = { intensity: 0.4, color: color };
+    }
+  };
+
+  Warfield.prototype.injectBlock = function(blockEvent) {
+    this.eventFlash = 1.5;
+    var fc = this.state && (this.state.factions || []).find(function(f) { return f.id === blockEvent.faction; });
+    this.eventFlashColor = fc ? hexToRgb(fc.color) : { r: 255, g: 200, b: 50 };
+    this.shockwave = { x: this.width / 2, y: this.height / 2, radius: 0, maxRadius: Math.max(this.width, this.height), speed: 4 };
+    for (var i = 0; i < 30; i++) {
+      this.pressureWaves.push({
+        x: this.width * Math.random(),
+        y: this.height * Math.random(),
+        radius: 0,
+        maxRadius: 60 + Math.random() * 40,
+        speed: 1 + Math.random(),
+        color: this.eventFlashColor,
+        alpha: 0.3
+      });
+    }
+  };
+
+  Warfield.prototype.injectBattleEvent = function(evt) {
+    if (evt.type === 'territory_flip' || evt.type === 'offline_decay') {
+      this.eventFlash = 0.5;
+      this.eventFlashColor = { r: 255, g: 100, b: 100 };
+    }
+  };
+
+  Warfield.prototype._render = function(timestamp) {
+    if (!this.running) return;
+    this.time = timestamp;
+    var ctx = this.ctx;
+    var w = this.width;
+    var h = this.height;
+
+    ctx.clearRect(0, 0, w, h);
+    this._drawBackground(ctx, w, h);
+    this._drawTerritories(ctx, w, h, timestamp);
+    this._drawTerritoryPulses(ctx, w, h);
+    this._drawFrontlines(ctx, w, h, timestamp);
+    this._drawPressureWaves(ctx, w, h, timestamp);
+    this._drawShockwave(ctx, w, h);
+    this._drawForests(ctx, w, h, timestamp);
+    this._drawLinks(ctx, w, h);
+    this._drawFacilities(ctx, w, h, timestamp);
+    this._drawUnits(ctx, w, h, timestamp);
+    this._drawSectorLabels(ctx, w, h, timestamp);
+    this._drawParticles(ctx, w, h, timestamp);
+    this._drawEventFlash(ctx, w, h);
+
+    this.frameId = requestAnimationFrame(this._boundRender);
+  };
+
+  Warfield.prototype._drawTerritoryPulses = function(ctx, w, h) {
+    if (!this.territoryPulses || !this.state) return;
+    var territories = this.state.territories || [];
+    var keys = Object.keys(this.territoryPulses);
+    for (var i = keys.length - 1; i >= 0; i--) {
+      var id = keys[i];
+      var pulse = this.territoryPulses[id];
+      pulse.intensity *= 0.93;
+      if (pulse.intensity < 0.02) { delete this.territoryPulses[id]; continue; }
+      var t = territories.find(function(tt) { return tt.id === id; });
+      if (!t) continue;
+      var cx = t.x * w / 100;
+      var cy = t.y * h / 100;
+      var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60);
+      grad.addColorStop(0, 'rgba(' + pulse.color.r + ',' + pulse.color.g + ',' + pulse.color.b + ',' + (pulse.intensity * 0.5) + ')');
+      grad.addColorStop(1, 'rgba(' + pulse.color.r + ',' + pulse.color.g + ',' + pulse.color.b + ',0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 60, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+
+  Warfield.prototype._drawShockwave = function(ctx, w, h) {
+    if (!this.shockwave) return;
+    var sw = this.shockwave;
+    sw.radius += sw.speed;
+    if (sw.radius > sw.maxRadius) { this.shockwave = null; return; }
+    var progress = sw.radius / sw.maxRadius;
+    var alpha = 0.4 * (1 - progress);
+    ctx.strokeStyle = 'rgba(255, 220, 150, ' + alpha + ')';
+    ctx.lineWidth = 3 - progress * 2;
+    ctx.beginPath();
+    ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+    ctx.stroke();
+  };
+
   window.Warfield = Warfield;
 })();

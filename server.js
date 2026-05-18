@@ -297,6 +297,44 @@ pool.on('share', function (isValidShare, isValidBlock, data) {
     const blockStatus = isValidBlock ? ' block-candidate' : '';
     const reason = data && data.error ? ` (${data.error})` : '';
     console.log(`Share ${status}${blockStatus}: ${result.worker.workername}${reason}`);
+
+    broadcast('share', {
+        worker: result.worker.workername,
+        callsign: result.worker.callsign || result.worker.workername.split('.').slice(1).join('.'),
+        faction: result.worker.faction,
+        territory: result.worker.territory,
+        valid: !!isValidShare,
+        block: !!isValidBlock,
+        hashrate: result.worker.hashrate,
+        timestamp: Date.now()
+    });
+
+    if (isValidBlock) {
+        const faction = result.worker.faction;
+        const factionDef = require('./lib/poolStatsStore.js').INVENTORY_ITEMS ? null : null;
+        broadcast('block', {
+            finder: result.worker.workername,
+            callsign: result.worker.callsign,
+            faction: faction,
+            height: data && data.height,
+            timestamp: Date.now()
+        });
+    }
+});
+
+pool.on('difficultyUpdate', function (workerName, diff) {
+    const worker = stats.ensureWorker(workerName);
+    worker.difficulty = diff;
+    worker.lastseen = Date.now();
+    stats.save();
+    broadcast('worker_update', {
+        worker: workerName,
+        callsign: worker.callsign,
+        faction: worker.faction,
+        difficulty: diff,
+        hashrate: worker.hashrate,
+        timestamp: Date.now()
+    });
 });
 
 pool.on('newBlock', async function (block) {
@@ -308,13 +346,6 @@ pool.on('newBlock', async function (block) {
     } catch (error) {
         console.warn(`Unable to update network stats: ${error.message || error}`);
     }
-});
-
-pool.on('difficultyUpdate', function (workerName, diff) {
-    const worker = stats.ensureWorker(workerName);
-    worker.difficulty = diff;
-    worker.lastseen = Date.now();
-    stats.save();
 });
 
 pool.on('banIP', function (ip, workerName) {
@@ -333,6 +364,37 @@ const apiHost = process.env.API_HOST || process.env.API_BIND_ADDRESS || process.
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+const sseClients = new Map();
+let sseNextId = 1;
+
+function broadcast(event, data) {
+    if (sseClients.size === 0) return;
+    const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+    sseClients.forEach((res) => {
+        try { res.write(message); } catch (e) { /* client gone */ }
+    });
+}
+
+app.get('/api/events', (req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no'
+    });
+    res.flushHeaders();
+    const clientId = sseNextId++;
+    sseClients.set(clientId, res);
+    res.write(`event: connected\ndata: {"clientId":${clientId}}\n\n`);
+    const keepalive = setInterval(() => {
+        try { res.write(': keepalive\n\n'); } catch (e) { clearInterval(keepalive); }
+    }, 15000);
+    req.on('close', () => {
+        clearInterval(keepalive);
+        sseClients.delete(clientId);
+    });
+});
 
 function resolveAuthToken(req) {
     const header = req.get('authorization') || '';

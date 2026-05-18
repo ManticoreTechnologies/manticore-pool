@@ -303,6 +303,113 @@ function renderMiner(summary) {
 
 var warfield = null;
 var lastWarsState = null;
+var liveFeed = [];
+var sseSource = null;
+var shareCounter = { value: 0, target: 0, lastUpdate: 0 };
+
+function connectSSE() {
+  if (sseSource) return;
+  if (!byId('war-canvas') && !byId('wars-event-name')) return;
+  try {
+    sseSource = new EventSource('/api/events');
+    sseSource.addEventListener('share', function(e) {
+      var data = JSON.parse(e.data);
+      handleLiveShare(data);
+    });
+    sseSource.addEventListener('block', function(e) {
+      var data = JSON.parse(e.data);
+      handleLiveBlock(data);
+    });
+    sseSource.addEventListener('worker_update', function(e) {
+      var data = JSON.parse(e.data);
+      handleWorkerUpdate(data);
+    });
+    sseSource.onerror = function() {
+      sseSource.close();
+      sseSource = null;
+      setTimeout(connectSSE, 5000);
+    };
+  } catch (ex) { /* SSE not supported */ }
+}
+
+function handleLiveShare(data) {
+  if (warfield && data.valid) {
+    warfield.injectShare(data);
+  }
+  shareCounter.target++;
+  var feedEntry = {
+    timestamp: data.timestamp || Date.now(),
+    type: data.block ? 'block' : data.valid ? 'share' : 'reject',
+    message: (data.callsign || data.worker.split('.').pop()) + (data.valid ? ' +share → ' + (data.territory || '?') : ' ✗ rejected'),
+    faction: data.faction
+  };
+  liveFeed.unshift(feedEntry);
+  liveFeed = liveFeed.slice(0, 30);
+  renderLiveFeed();
+}
+
+function handleLiveBlock(data) {
+  if (warfield) warfield.injectBlock(data);
+  var feedEntry = {
+    timestamp: data.timestamp || Date.now(),
+    type: 'block',
+    message: '⚡ BLOCK FOUND by ' + (data.callsign || data.finder) + ' — faction shockwave emitted',
+    faction: data.faction
+  };
+  liveFeed.unshift(feedEntry);
+  liveFeed = liveFeed.slice(0, 30);
+  renderLiveFeed();
+  showBigMoment('BLOCK DETECTED', data.faction);
+}
+
+function handleWorkerUpdate(data) {
+  if (warfield && lastWarsState) {
+    var unit = (lastWarsState.mapUnits || []).find(function(u) { return u.workername === data.worker; });
+    if (unit) unit.hashrate = data.hashrate;
+  }
+}
+
+function renderLiveFeed() {
+  var container = byId('war-live-feed');
+  if (!container) return;
+  container.innerHTML = liveFeed.slice(0, 8).map(function(entry) {
+    var time = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    var cls = entry.type === 'block' ? 'feed-block' : entry.type === 'reject' ? 'feed-reject' : 'feed-share';
+    return '<div class="feed-line ' + cls + '"><span class="feed-time">' + time + '</span> ' + escapeHtml(entry.message) + '</div>';
+  }).join('');
+}
+
+function showBigMoment(text, faction) {
+  var overlay = byId('war-big-moment');
+  if (!overlay) return;
+  overlay.textContent = text;
+  overlay.className = 'war-big-moment active';
+  overlay.setAttribute('data-faction', faction || '');
+  setTimeout(function() { overlay.className = 'war-big-moment'; }, 3500);
+}
+
+function interpolateCounter(id) {
+  var el = byId(id);
+  if (!el || !el._target) return;
+  var current = el._current || 0;
+  var target = el._target;
+  var diff = target - current;
+  if (Math.abs(diff) < 1) { el._current = target; return; }
+  el._current = current + diff * 0.1;
+  el.textContent = Math.round(el._current).toLocaleString();
+}
+
+function setAnimatedText(id, value) {
+  var el = byId(id);
+  if (!el) return;
+  var num = Number(value);
+  if (Number.isFinite(num) && num > 10) {
+    el._target = num;
+    if (!el._current) el._current = num;
+  } else {
+    el.textContent = value;
+  }
+}
 
 function initWarfield() {
   if (warfield) return;
@@ -320,6 +427,7 @@ function renderHashWars(state) {
   lastWarsState = state;
 
   initWarfield();
+  connectSSE();
   if (warfield) warfield.updateState(state);
 
   setText('wars-event-name', state.event.name);
@@ -327,10 +435,10 @@ function renderHashWars(state) {
   if (byId('wars-event-bar')) {
     byId('wars-event-bar').style.width = state.event.progress + '%';
   }
-  setText('wars-units', state.totals.units);
-  setText('wars-active-units', state.totals.activeUnits);
+  setAnimatedText('wars-units', state.totals.units);
+  setAnimatedText('wars-active-units', state.totals.activeUnits);
   setText('wars-hashrate', formatHashrate(state.totals.hashrate));
-  setText('wars-energy', Math.round(state.totals.pressure || state.totals.energy).toLocaleString());
+  setAnimatedText('wars-energy', Math.round(state.totals.pressure || state.totals.energy));
 
   renderWarFactionBar(state);
   renderWarUnits(state);
@@ -854,10 +962,16 @@ function updateMissionClock() {
 
 updateMissionClock();
 updateAuthUI();
+connectSSE();
 if (byId('connect-host')) {
   updateConnectPreview();
 }
 setInterval(updateMissionClock, 1000);
+setInterval(function() {
+  interpolateCounter('wars-units');
+  interpolateCounter('wars-active-units');
+  interpolateCounter('wars-energy');
+}, 60);
 refresh();
 refreshAccount();
 setInterval(refresh, 15000);
