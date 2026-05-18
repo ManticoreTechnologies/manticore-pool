@@ -56,6 +56,10 @@ function currentAddressFilter() {
   return byId('address-filter').value.trim();
 }
 
+function connectHostDefault() {
+  return window.location.hostname || 'your-pool-host';
+}
+
 async function getJson(url) {
   var response = await fetch(url);
   if (!response.ok) {
@@ -110,6 +114,13 @@ function renderConfig(config) {
   var ports = config.stratumPorts && config.stratumPorts.length ? config.stratumPorts.join(' / ') : '3333 / 3334';
   setText('stratum-signal', ports);
   setText('payout-mode', config.payoutsEnabled ? 'Auto armed' : 'Manual');
+  var portSelect = byId('connect-port');
+  if (portSelect && config.stratumPorts && config.stratumPorts.length && portSelect.children.length <= 2) {
+    portSelect.innerHTML = config.stratumPorts.map(function(port, index) {
+      return '<option value="' + escapeHtml(port) + '">' + escapeHtml(port) + (index === 0 ? ' - standard' : ' - alternate') + '</option>';
+    }).join('');
+    updateConnectPreview();
+  }
 }
 
 function renderWorkers(workers) {
@@ -286,11 +297,98 @@ byId('manual-payout').addEventListener('click', async function() {
   }
 });
 
+function openMenu() {
+  document.body.classList.add('nav-open');
+  byId('menu-button').setAttribute('aria-expanded', 'true');
+  byId('menu-button').textContent = '×';
+  byId('nav-overlay').setAttribute('aria-hidden', 'false');
+}
+
+function closeMenu() {
+  document.body.classList.remove('nav-open');
+  byId('menu-button').setAttribute('aria-expanded', 'false');
+  byId('menu-button').textContent = '☰';
+  byId('nav-overlay').setAttribute('aria-hidden', 'true');
+}
+
+function updateConnectPreview() {
+  var host = byId('connect-host').value.trim() || connectHostDefault();
+  var port = byId('connect-port').value || '3333';
+  var address = byId('connect-address').value.trim() || 'EvrmoreAddress';
+  var worker = byId('connect-worker').value.trim() || 'Rig01';
+  var password = byId('connect-password').value.trim() || 'x';
+  var profile = byId('connect-profile').value;
+  var workerName = address + '.' + worker.replace(/[^a-zA-Z0-9._-]/g, '');
+  var hostPort = host + ':' + port;
+  setText('connect-mrr-host', hostPort);
+  setText('connect-workername', workerName);
+  setText('connect-uri', 'stratum+tcp://' + workerName + ':' + password + '@' + hostPort);
+  setText('connect-hint', profile === 'mrr'
+    ? 'For MRR, use host:port without the stratum+tcp:// prefix in the host field.'
+    : 'For most miners, use the full stratum URI and keep password as x unless you need custom metadata.');
+}
+
+async function copyFromElement(id) {
+  var text = byId(id).textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  var textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  textarea.remove();
+}
+
+byId('menu-button').addEventListener('click', function() {
+  if (document.body.classList.contains('nav-open')) {
+    closeMenu();
+  } else {
+    openMenu();
+  }
+});
+byId('nav-close').addEventListener('click', closeMenu);
+byId('nav-overlay').addEventListener('click', function(event) {
+  if (event.target === byId('nav-overlay')) {
+    closeMenu();
+  }
+});
+Array.prototype.forEach.call(document.querySelectorAll('.nav-item'), function(link) {
+  link.addEventListener('click', closeMenu);
+});
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeMenu();
+  }
+});
+
+['connect-host', 'connect-port', 'connect-address', 'connect-worker', 'connect-password', 'connect-profile'].forEach(function(id) {
+  byId(id).addEventListener('input', updateConnectPreview);
+  byId(id).addEventListener('change', updateConnectPreview);
+});
+Array.prototype.forEach.call(document.querySelectorAll('.copy-button'), function(button) {
+  button.addEventListener('click', async function() {
+    var label = button.textContent;
+    try {
+      await copyFromElement(button.getAttribute('data-copy-target'));
+      button.textContent = 'Copied';
+      setTimeout(function() { button.textContent = label; }, 1200);
+    } catch (error) {
+      button.textContent = 'Copy failed';
+      setTimeout(function() { button.textContent = label; }, 1200);
+    }
+  });
+});
+
 var initialFilter = currentAddressFilter();
 if (initialFilter) {
   byId('address-filter').value = initialFilter;
   byId('miner-address').value = initialFilter;
+  byId('connect-address').value = initialFilter;
 }
+byId('connect-host').value = connectHostDefault();
 
 function updateMissionClock() {
   var now = new Date();
@@ -298,6 +396,7 @@ function updateMissionClock() {
 }
 
 updateMissionClock();
+updateConnectPreview();
 setInterval(updateMissionClock, 1000);
 refresh();
 setInterval(refresh, 15000);

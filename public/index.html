@@ -19,8 +19,37 @@
         <small>Technology</small>
       </span>
     </a>
-    <button class="menu-button" type="button" aria-label="Pool menu">☰</button>
+    <button class="menu-button" id="menu-button" type="button" aria-label="Pool menu" aria-expanded="false">☰</button>
   </header>
+
+  <aside class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-panel">
+      <div class="nav-topline">
+        <p class="eyebrow">// Navigation</p>
+        <button class="nav-close" id="nav-close" type="button" aria-label="Close menu">×</button>
+      </div>
+      <a href="/" class="nav-item">
+        <span>01</span>
+        <strong>Pool Console</strong>
+        <small>Telemetry, network status, and pool-wide proof trail.</small>
+      </a>
+      <a href="#connect" class="nav-item">
+        <span>02</span>
+        <strong>Connect Rig</strong>
+        <small>Build your MRR profile, worker name, and stratum endpoint.</small>
+      </a>
+      <a href="#miner-panel" class="nav-item">
+        <span>03</span>
+        <strong>Miner Dashboard</strong>
+        <small>Workers, balances, payout settings, and manual payout controls.</small>
+      </a>
+      <a href="#blocks" class="nav-item">
+        <span>04</span>
+        <strong>Proof Trail</strong>
+        <small>Block radar and payout ledger.</small>
+      </a>
+    </div>
+  </aside>
 
   <header class="command-header">
     <div class="mission-title">
@@ -41,6 +70,7 @@
   <main class="mission-shell">
     <nav class="tabs">
       <a href="/" id="home-link">Pool Console</a>
+      <a href="#connect" id="connect-link">Connect Rig</a>
       <a href="#" id="miner-link">Miner Dashboard</a>
       <a href="/api/payouts">Payout Ledger</a>
     </nav>
@@ -111,6 +141,75 @@
         <strong><span id="pool-unpaid">0 EVR</span></strong>
         <small id="pool-paid">0 EVR paid</small>
       </article>
+    </section>
+
+    <section class="connect-experience" id="connect">
+      <div class="connect-bg-orbit" aria-hidden="true"></div>
+      <div class="connect-copy">
+        <p class="eyebrow">// Rig Onboarding</p>
+        <h2>Connect your miner without guesswork</h2>
+        <p class="muted">Enter your payout address and worker label. Mission Control generates the MiningRigRentals fields and full stratum URI, then lets you copy each value.</p>
+      </div>
+
+      <div class="connect-console">
+        <div class="connect-steps">
+          <div class="step active"><span>01</span><strong>Endpoint</strong><small>Pick stratum port</small></div>
+          <div class="step"><span>02</span><strong>Identity</strong><small>Address + worker</small></div>
+          <div class="step"><span>03</span><strong>Launch</strong><small>Copy config</small></div>
+        </div>
+
+        <div class="connect-form">
+          <label>
+            Pool host
+            <input id="connect-host" placeholder="18.217.251.227">
+          </label>
+          <label>
+            Stratum port
+            <select id="connect-port">
+              <option value="3333">3333 - standard</option>
+              <option value="3334">3334 - alternate</option>
+            </select>
+          </label>
+          <label>
+            EVR payout address
+            <input id="connect-address" placeholder="E...">
+          </label>
+          <label>
+            Worker label
+            <input id="connect-worker" placeholder="Rig01">
+          </label>
+          <label>
+            Password
+            <input id="connect-password" placeholder="x" value="x">
+          </label>
+          <label>
+            Miner profile
+            <select id="connect-profile">
+              <option value="mrr">MiningRigRentals</option>
+              <option value="generic">Generic stratum miner</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="launch-card">
+          <div>
+            <span>MRR Pool Host:Port</span>
+            <code id="connect-mrr-host">host:3333</code>
+            <button class="copy-button" data-copy-target="connect-mrr-host">Copy host</button>
+          </div>
+          <div>
+            <span>Workername</span>
+            <code id="connect-workername">E....Rig01</code>
+            <button class="copy-button" data-copy-target="connect-workername">Copy worker</button>
+          </div>
+          <div>
+            <span>Full stratum URI</span>
+            <code id="connect-uri">stratum+tcp://E....Rig01:x@host:3333</code>
+            <button class="copy-button" data-copy-target="connect-uri">Copy URI</button>
+          </div>
+          <p class="muted" id="connect-hint">For MRR, use host:port without the stratum+tcp:// prefix in the host field.</p>
+        </div>
+      </div>
     </section>
 
     <section class="mission-grid">
