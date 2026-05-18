@@ -168,6 +168,18 @@ Useful environment variables:
 	STRATUM_HOST=0.0.0.0
 	API_HOST=0.0.0.0
 	API_PORT=3000
+	BLOCK_REFRESH_INTERVAL=10000
+	JOB_REBROADCAST_TIMEOUT=90
+	SHARE_VALIDATION_CONCURRENCY=1
+	SHARE_VALIDATION_QUEUE_SIZE=256
+	ENFORCE_NONCE_PREFIX=false
+	PAYOUTS_ENABLED=false
+	PAYOUT_THRESHOLD=100000
+	PAYOUT_MATURITY_CONFIRMATIONS=100
+	PAYOUT_MIN_CONFIRMATIONS=100
+	PAYOUT_INTERVAL_MS=300000
+	PAYOUT_ADMIN_TOKEN=optional-dashboard-token
+	WALLET_PASSPHRASE=optional-wallet-passphrase
 	POOL_STATE_FILE=/path/to/pool-state.json
 
 On the remote Evrmore node, make sure `evrmore.conf` allows RPC from the pool server's IP. Example:
@@ -177,6 +189,46 @@ On the remote Evrmore node, make sure `evrmore.conf` allows RPC from the pool se
 	rpcallowip=<pool-server-public-or-private-ip>
 	rpcuser=<rpcuser>
 	rpcpassword=<rpcpassword>
+	rpcworkqueue=128
+
+For a remote node, keep `BLOCK_REFRESH_INTERVAL` at 10000ms or higher and
+`SHARE_VALIDATION_CONCURRENCY=1` unless the node has been tuned for heavier RPC
+load. `getevrprogpowhash` is called for share validation, so high-rental traffic
+can otherwise fill the Evrmore RPC work queue.
+
+MRR and several Evrprogpow miners do not reserve nonce ranges using the stratum
+extranonce, so `ENFORCE_NONCE_PREFIX` defaults to `false`. Turn it on only if
+all connected miners are known to honor the assigned nonce prefix.
+
+EVRPROGPOW uses a 12000-block epoch for seed/DAG generation. If every share is
+rejected as `bad share: invalid hash`, check that miners restarted after the
+pool updated jobs and are not using stale work from before this seed setting.
+
+## Payouts
+
+The pool records each accepted block's worker allocations in `POOL_STATE_FILE`.
+Automatic payouts are opt-in:
+
+	PAYOUTS_ENABLED=true npm start
+
+When enabled, the payout worker:
+
+	- refreshes confirmations for found blocks with `getblock`
+	- waits for `PAYOUT_MATURITY_CONFIRMATIONS` confirmations
+	- groups mature unpaid allocations by miner payout address
+	- skips addresses below `PAYOUT_THRESHOLD` satoshis
+	- validates addresses with the Evrmore node
+	- sends one wallet `sendmany` transaction
+	- marks the exact paid allocations with the payout txid
+
+The Evrmore RPC node must have wallet RPC enabled, must control spendable mature
+coinbase funds for `POOL_ADDRESS`, and must be unlocked or have
+`WALLET_PASSPHRASE` configured. Keep backups of `POOL_STATE_FILE`; it is the
+source of truth for unpaid and paid accounting.
+
+The public dashboard can show miner stats without authentication. If
+`PAYOUT_ADMIN_TOKEN` is set, manual payouts and payout preference changes require
+that token. The browser will prompt for it and store it locally.
 
 The JSON API and browser dashboard are served from the same process:
 
@@ -185,6 +237,7 @@ The JSON API and browser dashboard are served from the same process:
 	http://your-pool-host:3000/api/poolstats
 	http://your-pool-host:3000/api/workers
 	http://your-pool-host:3000/api/netstats
+	http://your-pool-host:3000/api/payouts
 
 For a public VPS dashboard, keep `API_HOST=0.0.0.0` and allow TCP `API_PORT`
 through both the OS firewall and the VPS/cloud provider firewall or security group.

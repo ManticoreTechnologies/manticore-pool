@@ -45,15 +45,25 @@ const options = {
     address: process.env.POOL_ADDRESS || fileConfig.miningaddress || "EcmFc6abS8xPkMpzWrZSo9yEU2jgcDhkzd",
     feeAddress: process.env.POOL_FEE_ADDRESS || "EWop2wCsufxboP19De9tY3hMaPKNUiUupL",
     payoutThreshold: parseNumber(process.env.PAYOUT_THRESHOLD, 100000),
+    payoutsEnabled: process.env.PAYOUTS_ENABLED === 'true',
+    payoutInterval: parseNumber(process.env.PAYOUT_INTERVAL_MS, 300000),
+    payoutMaturityConfirmations: parseNumber(process.env.PAYOUT_MATURITY_CONFIRMATIONS, 100),
+    payoutMinConfirmations: parseNumber(process.env.PAYOUT_MIN_CONFIRMATIONS, 100),
+    walletPassphrase: process.env.WALLET_PASSPHRASE || '',
+    walletUnlockSeconds: parseNumber(process.env.WALLET_UNLOCK_SECONDS, 60),
+    payoutAdminToken: process.env.PAYOUT_ADMIN_TOKEN || '',
 
     // Reward recipients configuration
     rewardRecipients: {
         "eHNUGzw8ZG9PGC8gKtnneyMaQXQTtAUm98": 10 // 10% to Miner dev fund
     },
 
-    blockRefreshInterval: parseNumber(process.env.BLOCK_REFRESH_INTERVAL, 1000),
+    blockRefreshInterval: parseNumber(process.env.BLOCK_REFRESH_INTERVAL, 10000),
     getNewBlockAfterFound: true, // Automatically get new block after finding one
-    jobRebroadcastTimeout: 55, // Timeout for rebroadcasting jobs
+    jobRebroadcastTimeout: parseNumber(process.env.JOB_REBROADCAST_TIMEOUT, 90),
+    maxShareValidationConcurrency: parseNumber(process.env.SHARE_VALIDATION_CONCURRENCY, 1),
+    maxShareValidationQueue: parseNumber(process.env.SHARE_VALIDATION_QUEUE_SIZE, 256),
+    enforceNoncePrefix: process.env.ENFORCE_NONCE_PREFIX === 'true',
 
     // Connection management
     connectionTimeout: 1200, // Timeout for inactive workers in seconds

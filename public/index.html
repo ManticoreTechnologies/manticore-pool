@@ -3,89 +3,112 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>EVR Pool Dashboard</title>
+  <title>Manticore EVR Pool Console</title>
   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-  <header class="hero">
-    <div>
-      <p class="eyebrow">Evrmore Pool</p>
-      <h1>Pool Dashboard</h1>
-      <p class="muted">Live stratum, miner, block, and network stats from this pool instance.</p>
-    </div>
-    <div class="status" id="health">Connecting...</div>
+<body data-page="home">
+  <div class="starscape" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="site-bar">
+    <a class="brand-lockup" href="/">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span><strong>Manticore</strong><small>Technology</small></span>
+    </a>
+    <button class="menu-button" id="menu-button" type="button" aria-label="Pool menu" aria-expanded="false">☰</button>
   </header>
 
-  <main>
+  <aside class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-panel">
+      <div class="nav-topline"><p class="eyebrow">// Navigation</p><button class="nav-close" id="nav-close" type="button" aria-label="Close menu">×</button></div>
+      <a href="/" class="nav-item"><span>01</span><strong>Pool Console</strong><small>Telemetry, network status, and system posture.</small></a>
+      <a href="/connect" class="nav-item"><span>02</span><strong>Connect Rig</strong><small>Build MRR profile, worker name, and stratum endpoint.</small></a>
+      <a href="/miner" class="nav-item"><span>03</span><strong>Miner Dashboard</strong><small>Workers, balances, payout settings, and manual payout controls.</small></a>
+      <a href="/proof" class="nav-item"><span>04</span><strong>Proof Trail</strong><small>Block radar and payout ledger.</small></a>
+    </div>
+  </aside>
+
+  <header class="command-header">
+    <div class="mission-title">
+      <p class="eyebrow">Manticore EVR / Proof-of-Work Operations</p>
+      <h1><span>Manticore</span> Pool</h1>
+      <p class="muted hero-statement">Verifiable mining infrastructure for the Evrmore ecosystem: live stratum telemetry, signed payout accounting, and operational evidence you can inspect.</p>
+    </div>
+    <div class="command-status">
+      <div class="status online" id="health">Connecting...</div>
+      <div class="mission-clock"><span>UTC</span><strong id="mission-time">--:--:--</strong></div>
+    </div>
+  </header>
+
+  <main class="mission-shell">
+    <nav class="tabs">
+      <a href="/" id="home-link">Pool Console</a>
+      <a href="/connect" id="connect-link">Connect Rig</a>
+      <a href="/miner" id="miner-link">Miner Dashboard</a>
+      <a href="/proof">Proof Trail</a>
+    </nav>
+
+    <section class="hero-console">
+      <div class="orbital-core">
+        <div class="orbital-ring ring-one"></div>
+        <div class="orbital-ring ring-two"></div>
+        <div class="orbital-center"><span>EVR</span><strong>TRUST</strong></div>
+      </div>
+      <div class="console-copy">
+        <p class="eyebrow">// Pool Surface</p>
+        <h2>Systems that prove themselves</h2>
+        <p class="muted">Signal lock, payout ledger, worker manifest, and network radar are synchronized from this pool instance. Trust comes from traceable state, not a tagline.</p>
+        <div class="hero-actions">
+          <a href="/connect">Connect a rig</a>
+          <a href="/proof">Inspect proof trail</a>
+        </div>
+      </div>
+      <div class="signal-stack">
+        <div><span>Stratum</span><strong id="stratum-signal">3333 / 3334</strong></div>
+        <div><span>Auto Payouts</span><strong id="payout-mode">Standby</strong></div>
+        <div><span>Build Posture</span><strong>Shipping</strong></div>
+      </div>
+    </section>
+
+    <section class="trust-strip">
+      <div><span>// Pillar 1</span><strong>Proof over promise</strong></div>
+      <div><span>// Pillar 2</span><strong>Deterministic payouts</strong></div>
+      <div><span>// Pillar 3</span><strong>Local-first state</strong></div>
+    </section>
+
     <section class="grid cards">
-      <article>
-        <span>Pool Hashrate</span>
-        <strong id="pool-hashrate">0 H/s</strong>
-      </article>
-      <article>
-        <span>Active Miners</span>
-        <strong id="active-miners">0</strong>
-      </article>
-      <article>
-        <span>Blocks Found</span>
-        <strong id="blocks-found">0</strong>
-      </article>
-      <article>
-        <span>Valid / Invalid Shares</span>
-        <strong><span id="valid-shares">0</span> / <span id="invalid-shares">0</span></strong>
-      </article>
+      <article class="telemetry-card"><span>Pool Hashrate</span><strong id="pool-hashrate">0 H/s</strong><small>Array throughput</small></article>
+      <article class="telemetry-card"><span>Active Miners</span><strong id="active-miners">0</strong><small>Connected crews</small></article>
+      <article class="telemetry-card"><span>Blocks Found</span><strong id="blocks-found">0</strong><small>Candidate captures</small></article>
+      <article class="telemetry-card"><span>Valid / Invalid Shares</span><strong><span id="valid-shares">0</span> / <span id="invalid-shares">0</span></strong><small>Signal integrity</small></article>
+      <article class="telemetry-card"><span>Unpaid / Paid</span><strong><span id="pool-unpaid">0 EVR</span></strong><small id="pool-paid">0 EVR paid</small></article>
     </section>
 
-    <section class="panel">
-      <div class="panel-header">
-        <div>
-          <h2>Network</h2>
-          <p class="muted">Connected Evrmore node status.</p>
+    <section class="mission-grid">
+      <section class="panel mission-panel network-panel">
+        <div class="panel-header">
+          <div><p class="panel-kicker">// Network Radar</p><h2>Evrmore link status</h2><p class="muted">Connected core-node telemetry and pool network share.</p></div>
+          <button id="refresh">Refresh telemetry</button>
         </div>
-        <button id="refresh">Refresh</button>
-      </div>
-      <div class="grid stats">
-        <div><span>Height</span><strong id="net-height">-</strong></div>
-        <div><span>Difficulty</span><strong id="net-difficulty">-</strong></div>
-        <div><span>Network Hashrate</span><strong id="net-hashrate">-</strong></div>
-        <div><span>Pool Network Share</span><strong id="network-share">-</strong></div>
-      </div>
-    </section>
+        <div class="grid stats">
+          <div><span>Height</span><strong id="net-height">-</strong></div>
+          <div><span>Difficulty</span><strong id="net-difficulty">-</strong></div>
+          <div><span>Network Hashrate</span><strong id="net-hashrate">-</strong></div>
+          <div><span>Pool Network Share</span><strong id="network-share">-</strong></div>
+        </div>
+      </section>
 
-    <section class="panel">
-      <div class="panel-header">
-        <div>
-          <h2>Workers</h2>
-          <p class="muted">Append an address to the URL, for example <code>/dashboard/E...</code>, to filter.</p>
+      <aside class="panel mission-panel uplink-panel">
+        <p class="panel-kicker">// System Links</p>
+        <h2>Operational pages</h2>
+        <p class="muted">The interface is now split into focused surfaces for pool operators and miners.</p>
+        <div class="signal-stack">
+          <div><span>Rig onboarding</span><strong><a href="/connect">/connect</a></strong></div>
+          <div><span>Miner console</span><strong><a href="/miner">/miner</a></strong></div>
+          <div><span>Proof ledger</span><strong><a href="/proof">/proof</a></strong></div>
         </div>
-        <input id="address-filter" placeholder="Filter by payout address">
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Worker</th>
-              <th>Hashrate</th>
-              <th>Valid</th>
-              <th>Invalid</th>
-              <th>Blocks</th>
-              <th>Unpaid</th>
-              <th>Last Share</th>
-            </tr>
-          </thead>
-          <tbody id="workers"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="panel-header">
-        <div>
-          <h2>Recent Blocks</h2>
-          <p class="muted">Block candidates submitted by the pool.</p>
-        </div>
-      </div>
-      <div id="blocks" class="list"></div>
+      </aside>
     </section>
   </main>
 
