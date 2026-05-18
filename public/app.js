@@ -250,14 +250,7 @@ function renderHashWars(state) {
       '</article>';
   }).join('');
 
-  var territories = byId('wars-territories');
-  territories.innerHTML = state.territories.map(function(territory) {
-    return '<article class="territory-card">' +
-      '<span>' + escapeHtml(territory.status) + '</span>' +
-      '<strong>' + escapeHtml(territory.name) + '</strong>' +
-      '<small>' + escapeHtml(territory.ownerName) + ' control: ' + territory.control + '% | ' + escapeHtml(territory.buff) + '</small>' +
-      '</article>';
-  }).join('');
+  renderWarMap(state);
 
   var units = byId('wars-units-list');
   units.innerHTML = state.units.length ? state.units.map(function(unit) {
@@ -276,6 +269,44 @@ function renderHashWars(state) {
 
   renderWarsCommand(state);
   renderWarsBattleLog(state.battleLog || []);
+}
+
+function renderWarMap(state) {
+  var layer = byId('wars-territories');
+  if (!layer) return;
+  var links = byId('wars-map-links');
+  links.innerHTML = (state.map.links || []).map(function(link) {
+    return '<line x1="' + link.x1 + '" y1="' + link.y1 + '" x2="' + link.x2 + '" y2="' + link.y2 + '"></line>';
+  }).join('');
+
+  var selected = layer.getAttribute('data-selected') || (state.territories[0] && state.territories[0].id);
+  layer.innerHTML = state.territories.map(function(territory) {
+    var active = territory.id === selected ? ' selected' : '';
+    return '<button class="war-sector' + active + '" data-sector="' + escapeHtml(territory.id) + '" style="--x:' + territory.x + ';--y:' + territory.y + ';--size:' + territory.size + ';--owner:' + escapeHtml(territory.ownerColor) + '">' +
+      '<span>' + escapeHtml(territory.name) + '</span>' +
+      '<strong>' + territory.control + '%</strong>' +
+      '</button>';
+  }).join('');
+
+  Array.prototype.forEach.call(layer.querySelectorAll('.war-sector'), function(button) {
+    button.addEventListener('click', function() {
+      layer.setAttribute('data-selected', button.getAttribute('data-sector'));
+      renderWarMap(state);
+    });
+  });
+
+  var detail = state.territories.find(function(territory) { return territory.id === selected; }) || state.territories[0];
+  renderSectorDetail(detail);
+}
+
+function renderSectorDetail(territory) {
+  var container = byId('wars-sector-detail');
+  if (!container || !territory) return;
+  container.innerHTML = '<article class="territory-card">' +
+    '<span>' + escapeHtml(territory.status) + ' / ' + escapeHtml(territory.anomaly) + '</span>' +
+    '<strong>' + escapeHtml(territory.name) + '</strong>' +
+    '<small>' + escapeHtml(territory.ownerName) + ' control: ' + territory.control + '% | ' + escapeHtml(territory.buff) + '</small>' +
+    '</article>';
 }
 
 function renderWarsCommand(state) {

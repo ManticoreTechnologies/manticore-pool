@@ -75,8 +75,12 @@
         <div id="wars-factions" class="faction-grid"></div>
       </section>
       <section class="panel mission-panel">
-        <div class="panel-header"><div><p class="panel-kicker">// Territory Map</p><h2>Sector control</h2><p class="muted">Territories recalculate from faction influence every refresh.</p></div></div>
-        <div id="wars-territories" class="territory-grid"></div>
+        <div class="panel-header"><div><p class="panel-kicker">// Territory Map</p><h2>Sector control</h2><p class="muted">Click sectors to inspect control, anomaly, and buffs. The lattice changes every event.</p></div></div>
+        <div class="war-map" id="wars-map">
+          <svg id="wars-map-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <div id="wars-territories" class="war-sector-layer"></div>
+        </div>
+        <div id="wars-sector-detail" class="sector-detail"></div>
       </section>
     </section>
 
