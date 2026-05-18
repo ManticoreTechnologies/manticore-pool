@@ -1,15 +1,15 @@
 {
   "startedAt": "2026-05-18T04:49:15.281Z",
-  "updatedAt": "2026-05-18T04:49:34.144Z",
+  "updatedAt": "2026-05-18T05:06:01.818Z",
   "workers": {},
   "addresses": {},
   "hashWars": {
     "season": {
       "name": "Season 0: Genesis Skirmish",
       "startedAt": 1779079774142,
-      "tick": 1
+      "tick": 4
     },
-    "lastTickAt": 1779079774142,
+    "lastTickAt": 1779080761817,
     "eventStartValidShares": 0,
     "eventTarget": 1000,
     "eventIndex": 0,
@@ -487,11 +487,11 @@
         "name": "Manticore Prime",
         "owner": "forge",
         "control": {
-          "forge": 53.5,
-          "revenants": 8.5,
-          "iron-legion": 8.5,
-          "null-syndicate": 8.5,
-          "ghost-grid": 8.5
+          "forge": 49,
+          "revenants": 4,
+          "iron-legion": 4,
+          "null-syndicate": 4,
+          "ghost-grid": 4
         },
         "buff": "+1% XP",
         "pressure": {
@@ -508,11 +508,11 @@
         "name": "Evrmore Gate",
         "owner": "revenants",
         "control": {
-          "forge": 8.5,
-          "revenants": 53.5,
-          "iron-legion": 8.5,
-          "null-syndicate": 8.5,
-          "ghost-grid": 8.5
+          "forge": 4,
+          "revenants": 49,
+          "iron-legion": 4,
+          "null-syndicate": 4,
+          "ghost-grid": 4
         },
         "buff": "+1% shield",
         "pressure": {
@@ -529,11 +529,11 @@
         "name": "Sentinel Belt",
         "owner": "iron-legion",
         "control": {
-          "forge": 8.5,
-          "revenants": 8.5,
-          "iron-legion": 53.5,
-          "null-syndicate": 8.5,
-          "ghost-grid": 8.5
+          "forge": 4,
+          "revenants": 4,
+          "iron-legion": 49,
+          "null-syndicate": 4,
+          "ghost-grid": 4
         },
         "buff": "+1% energy",
         "pressure": {
@@ -550,11 +550,11 @@
         "name": "PeerWeave Drift",
         "owner": "null-syndicate",
         "control": {
-          "forge": 8.5,
-          "revenants": 8.5,
-          "iron-legion": 8.5,
-          "null-syndicate": 53.5,
-          "ghost-grid": 8.5
+          "forge": 4,
+          "revenants": 4,
+          "iron-legion": 4,
+          "null-syndicate": 49,
+          "ghost-grid": 4
         },
         "buff": "+1% XP",
         "pressure": {
@@ -571,11 +571,11 @@
         "name": "Glyph Arena",
         "owner": "ghost-grid",
         "control": {
-          "forge": 8.5,
-          "revenants": 8.5,
-          "iron-legion": 8.5,
-          "null-syndicate": 8.5,
-          "ghost-grid": 53.5
+          "forge": 4,
+          "revenants": 4,
+          "iron-legion": 4,
+          "null-syndicate": 4,
+          "ghost-grid": 49
         },
         "buff": "+1% shield",
         "pressure": {
@@ -592,11 +592,11 @@
         "name": "Vault Nebula",
         "owner": "forge",
         "control": {
-          "forge": 53.5,
-          "revenants": 8.5,
-          "iron-legion": 8.5,
-          "null-syndicate": 8.5,
-          "ghost-grid": 8.5
+          "forge": 49,
+          "revenants": 4,
+          "iron-legion": 4,
+          "null-syndicate": 4,
+          "ghost-grid": 4
         },
         "buff": "+1% energy",
         "pressure": {
@@ -613,11 +613,11 @@
         "name": "Null Expanse",
         "owner": "revenants",
         "control": {
-          "forge": 8.5,
-          "revenants": 53.5,
-          "iron-legion": 8.5,
-          "null-syndicate": 8.5,
-          "ghost-grid": 8.5
+          "forge": 4,
+          "revenants": 49,
+          "iron-legion": 4,
+          "null-syndicate": 4,
+          "ghost-grid": 4
         },
         "buff": "+1% XP",
         "pressure": {
@@ -634,11 +634,11 @@
         "name": "Forge Moon",
         "owner": "iron-legion",
         "control": {
-          "forge": 8.5,
-          "revenants": 8.5,
-          "iron-legion": 53.5,
-          "null-syndicate": 8.5,
-          "ghost-grid": 8.5
+          "forge": 4,
+          "revenants": 4,
+          "iron-legion": 49,
+          "null-syndicate": 4,
+          "ghost-grid": 4
         },
         "buff": "+1% shield",
         "pressure": {
@@ -655,11 +655,11 @@
         "name": "Revenant Reach",
         "owner": "null-syndicate",
         "control": {
-          "forge": 8.5,
-          "revenants": 8.5,
-          "iron-legion": 8.5,
-          "null-syndicate": 53.5,
-          "ghost-grid": 8.5
+          "forge": 4,
+          "revenants": 4,
+          "iron-legion": 4,
+          "null-syndicate": 49,
+          "ghost-grid": 4
         },
         "buff": "+1% energy",
         "pressure": {

@@ -393,7 +393,13 @@ function renderWarNetworkAlerts(events) {
 
 async function refresh() {
   var health = byId('health');
+  var isWarsPage = !!byId('war-canvas');
   try {
+    if (isWarsPage) {
+      var warsData = await getJson('/api/hash-wars');
+      renderHashWars(warsData);
+      return;
+    }
     var address = currentAddressFilter();
     var workersUrl = address ? '/api/workers/' + encodeURIComponent(address) : '/api/workers';
     var requests = [
@@ -407,7 +413,7 @@ async function refresh() {
     if (address) {
       requests.push(getJson('/api/miner/' + encodeURIComponent(address)));
     }
-    if (byId('wars-event-name')) {
+    if (byId('wars-event-name') && !isWarsPage) {
       requests.push(getJson('/api/hash-wars'));
     }
     var results = await Promise.all(requests);
@@ -416,11 +422,9 @@ async function refresh() {
     renderPool(results[1]);
     if (!results[2].error) {
       renderNetwork(results[2]);
-      health.textContent = 'Online';
-      health.className = 'status online';
+      if (health) { health.textContent = 'Online'; health.className = 'status online'; }
     } else {
-      health.textContent = 'Node unavailable';
-      health.className = 'status warning';
+      if (health) { health.textContent = 'Node unavailable'; health.className = 'status warning'; }
     }
     renderWorkers(results[3]);
     renderBlocks(results[4]);
@@ -432,12 +436,11 @@ async function refresh() {
       if (byId('miner-panel')) byId('miner-panel').style.display = '';
       renderMiner({ address: '', totals: {}, preferences: { payoutThreshold: results[0].payoutThreshold || 0 }, payoutCandidates: { total: 0 } });
     }
-    if (byId('wars-event-name')) {
+    if (byId('wars-event-name') && !isWarsPage) {
       renderHashWars(results[results.length - 1]);
     }
   } catch (error) {
-    health.textContent = 'Dashboard error';
-    health.className = 'status warning';
+    if (health) { health.textContent = 'Dashboard error'; health.className = 'status warning'; }
     console.error(error);
   }
 }
