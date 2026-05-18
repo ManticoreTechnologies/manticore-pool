@@ -65,20 +65,60 @@ function connectHostDefault() {
   return window.location.hostname || 'your-pool-host';
 }
 
+function getAuthToken() {
+  return window.localStorage.getItem('authToken') || '';
+}
+
+function getAuthAddress() {
+  return window.localStorage.getItem('authAddress') || '';
+}
+
+function setAuth(token, address) {
+  window.localStorage.setItem('authToken', token);
+  window.localStorage.setItem('authAddress', address);
+}
+
+function clearAuth() {
+  window.localStorage.removeItem('authToken');
+  window.localStorage.removeItem('authAddress');
+}
+
+function isLoggedIn() {
+  return !!getAuthToken() && !!getAuthAddress();
+}
+
+function authHeaders() {
+  var headers = {};
+  var token = getAuthToken();
+  if (token) {
+    headers['authorization'] = 'Bearer ' + token;
+  }
+  return headers;
+}
+
 async function getJson(url) {
-  var response = await fetch(url);
+  var response = await fetch(url, { headers: authHeaders() });
   if (!response.ok) {
     throw new Error(await response.text());
   }
   return response.json();
 }
 
-async function sendJson(url, method, body) {
-  var headers = { 'content-type': 'application/json' };
-  var token = window.localStorage.getItem('payoutAdminToken');
-  if (token) {
-    headers['x-payout-admin-token'] = token;
+async function getJsonAuth(url) {
+  var token = getAuthToken();
+  if (!token) return null;
+  var response = await fetch(url, { headers: authHeaders() });
+  if (response.status === 401) {
+    clearAuth();
+    updateAuthUI();
+    return null;
   }
+  if (!response.ok) return null;
+  return response.json();
+}
+
+async function sendJson(url, method, body) {
+  var headers = Object.assign({ 'content-type': 'application/json' }, authHeaders());
   var response = await fetch(url, {
     method: method,
     headers: headers,
@@ -87,15 +127,54 @@ async function sendJson(url, method, body) {
   var data = await response.json().catch(function() { return {}; });
   if (!response.ok) {
     if (response.status === 401) {
-      var newToken = window.prompt('Enter payout admin token');
-      if (newToken) {
-        window.localStorage.setItem('payoutAdminToken', newToken);
-        return sendJson(url, method, body);
-      }
+      clearAuth();
+      updateAuthUI();
     }
     throw new Error(data.reason || data.error || JSON.stringify(data));
   }
   return data;
+}
+
+async function doLogin(address, password) {
+  var response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ address: address, password: password })
+  });
+  var data = await response.json().catch(function() { return {}; });
+  if (!response.ok) {
+    throw new Error(data.error || 'Login failed');
+  }
+  setAuth(data.token, data.address);
+  return data;
+}
+
+async function doLogout() {
+  try {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: authHeaders()
+    });
+  } catch (e) { /* ignore */ }
+  clearAuth();
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  var loginSections = document.querySelectorAll('.auth-login-section');
+  var authSections = document.querySelectorAll('.auth-protected');
+  var loggedIn = isLoggedIn();
+  Array.prototype.forEach.call(loginSections, function(el) {
+    el.style.display = loggedIn ? 'none' : '';
+  });
+  Array.prototype.forEach.call(authSections, function(el) {
+    el.style.display = loggedIn ? '' : 'none';
+  });
+  var addrLabels = document.querySelectorAll('.auth-address-label');
+  var addr = getAuthAddress();
+  Array.prototype.forEach.call(addrLabels, function(el) {
+    el.textContent = addr ? shortAddress(addr) : '';
+  });
 }
 
 function renderPool(pool) {
@@ -640,6 +719,123 @@ if (byId('war-close-sidebar')) {
     if (sb) sb.classList.add('collapsed');
   });
 }
+if (byId('war-close-sidebar-2')) {
+  byId('war-close-sidebar-2').addEventListener('click', function() {
+    var sb = byId('war-sidebar');
+    if (sb) sb.classList.add('collapsed');
+  });
+}
+
+if (byId('war-login-btn')) {
+  byId('war-login-btn').addEventListener('click', async function() {
+    var address = byId('war-login-address').value.trim();
+    var password = byId('war-login-password').value;
+    if (!address || !password) {
+      setText('war-login-message', 'Enter your address and password.');
+      return;
+    }
+    try {
+      await doLogin(address, password);
+      updateAuthUI();
+      setText('war-login-message', '');
+      refreshAccount();
+      refresh();
+    } catch (error) {
+      setText('war-login-message', error.message);
+    }
+  });
+}
+
+if (byId('miner-login-btn')) {
+  byId('miner-login-btn').addEventListener('click', async function() {
+    var address = byId('miner-login-address').value.trim();
+    var password = byId('miner-login-password').value;
+    if (!address || !password) {
+      setText('miner-login-message', 'Enter your address and password.');
+      return;
+    }
+    try {
+      await doLogin(address, password);
+      if (byId('address-filter')) byId('address-filter').value = address;
+      if (byId('miner-address')) byId('miner-address').value = address;
+      updateAuthUI();
+      refreshAccount();
+      refresh();
+    } catch (error) {
+      setText('miner-login-message', error.message);
+    }
+  });
+}
+
+if (byId('miner-logout-btn')) {
+  byId('miner-logout-btn').addEventListener('click', function() {
+    doLogout();
+    refresh();
+  });
+}
+
+var rarityColors = {
+  common: '#b9b4b0',
+  uncommon: '#78f5a5',
+  rare: '#8ca5ff',
+  epic: '#b36bff',
+  legendary: '#ffb140'
+};
+
+function renderInventory(containerId, items) {
+  var container = byId(containerId);
+  if (!container) return;
+  if (!items || !items.length) {
+    container.innerHTML = '<p class="war-muted empty">No items yet. Mine to earn loot.</p>';
+    return;
+  }
+  container.innerHTML = items.map(function(item) {
+    var color = rarityColors[item.rarity] || '#b9b4b0';
+    return '<div class="inventory-item" style="border-color:' + color + '">' +
+      '<div class="inv-header"><strong style="color:' + color + '">' + escapeHtml(item.name) + '</strong><span class="inv-qty">x' + item.quantity + '</span></div>' +
+      '<span class="inv-type">' + escapeHtml(item.rarity) + ' ' + escapeHtml(item.type) + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function renderAccountInfo(data) {
+  var container = byId('war-account-info');
+  if (container && data) {
+    container.innerHTML =
+      '<div class="war-intel-name">' + escapeHtml(shortAddress(data.address)) + '</div>' +
+      '<div class="war-intel-meta">Level ' + data.level + ' | XP: ' + data.xp.toLocaleString() + '</div>' +
+      '<div class="war-intel-meta">' + data.workers + ' workers | ' + data.activeWorkers + ' active | ' + formatHashrate(data.hashrate) + '</div>' +
+      '<button id="war-logout-btn" class="war-deploy-btn" style="margin-top:8px">Log Out</button>';
+    if (byId('war-logout-btn')) {
+      byId('war-logout-btn').addEventListener('click', function() {
+        doLogout();
+        refresh();
+      });
+    }
+  }
+  setText('account-level', data ? data.level : '1');
+  setText('account-xp', data ? data.xp.toLocaleString() : '0');
+}
+
+async function refreshAccount() {
+  if (!isLoggedIn()) return;
+  try {
+    var account = await getJsonAuth('/api/account');
+    if (account) {
+      renderAccountInfo(account);
+      renderInventory('war-inventory', account.inventory);
+      renderInventory('miner-inventory', account.inventory);
+    }
+  } catch (e) {
+    console.error('Account refresh failed:', e);
+  }
+}
+
+if (isLoggedIn()) {
+  var addr = getAuthAddress();
+  if (byId('address-filter')) byId('address-filter').value = addr;
+  if (byId('miner-address')) byId('miner-address').value = addr;
+}
 
 var initialFilter = currentAddressFilter();
 if (initialFilter) {
@@ -657,9 +853,12 @@ function updateMissionClock() {
 }
 
 updateMissionClock();
+updateAuthUI();
 if (byId('connect-host')) {
   updateConnectPreview();
 }
 setInterval(updateMissionClock, 1000);
 refresh();
+refreshAccount();
 setInterval(refresh, 15000);
+setInterval(refreshAccount, 30000);

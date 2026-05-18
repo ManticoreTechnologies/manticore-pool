@@ -2033,6 +2033,58 @@ td small {
   50% { opacity: 0.6; }
 }
 
+/* -- Account info -- */
+
+.war-account-summary {
+  font-family: var(--mono);
+}
+
+/* -- Inventory -- */
+
+.inventory-grid,
+.war-inventory-grid {
+  display: grid;
+  gap: 6px;
+}
+
+.inventory-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.inventory-item {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.inv-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.inv-header strong {
+  font-size: 0.82rem;
+}
+
+.inv-qty {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.inv-type {
+  color: var(--dim);
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+
 /* -- Wars page responsive -- */
 
 @media (max-width: 900px) {

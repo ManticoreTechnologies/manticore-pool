@@ -334,6 +334,55 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+function resolveAuthToken(req) {
+    const header = req.get('authorization') || '';
+    if (header.startsWith('Bearer ')) {
+        return stats.validateAuthToken(header.slice(7));
+    }
+    return null;
+}
+
+function requireAuth(req, res, next) {
+    const address = resolveAuthToken(req);
+    if (!address) {
+        res.status(401).json({ error: 'Authentication required. Log in with your miner address and password.' });
+        return;
+    }
+    req.authAddress = address;
+    next();
+}
+
+function requireAddressAuth(req, res, next) {
+    const address = resolveAuthToken(req);
+    if (!address) {
+        res.status(401).json({ error: 'Authentication required.' });
+        return;
+    }
+    const target = req.params.address || '';
+    if (address !== target) {
+        res.status(403).json({ error: 'Access denied. You can only access your own account.' });
+        return;
+    }
+    req.authAddress = address;
+    next();
+}
+
+function requireWorkerAuth(req, res, next) {
+    const address = resolveAuthToken(req);
+    if (!address) {
+        res.status(401).json({ error: 'Authentication required.' });
+        return;
+    }
+    const workerName = req.params.workerName || '';
+    const workerAddress = stats.workerAddress(workerName);
+    if (address !== workerAddress) {
+        res.status(403).json({ error: 'Access denied. You can only modify your own workers.' });
+        return;
+    }
+    req.authAddress = address;
+    next();
+}
+
 app.get('/api/health', async (req, res) => {
     try {
         const height = await DaemonUtility.getBlockHeight();
@@ -403,11 +452,56 @@ app.get('/api/miner/:address', (req, res) => {
     res.json(stats.getAddressSummary(req.params.address, options.payoutMaturityConfirmations));
 });
 
+app.post('/api/auth/login', (req, res) => {
+    const { address, password } = req.body || {};
+    const authenticated = stats.authenticateAddress(address, password);
+    if (!authenticated) {
+        res.status(401).json({ error: 'Invalid address or password. Use the password you set when connecting your miner.' });
+        return;
+    }
+    const token = stats.generateAuthToken(authenticated);
+    res.json({ token, address: authenticated });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+    const header = req.get('authorization') || '';
+    if (header.startsWith('Bearer ')) {
+        stats.revokeAuthToken(header.slice(7));
+    }
+    res.json({ ok: true });
+});
+
+app.get('/api/auth/verify', (req, res) => {
+    const address = resolveAuthToken(req);
+    if (!address) {
+        res.status(401).json({ valid: false });
+        return;
+    }
+    res.json({ valid: true, address });
+});
+
+app.get('/api/account', requireAuth, (req, res) => {
+    res.json(stats.getAccountState(req.authAddress));
+});
+
+app.get('/api/account/inventory', requireAuth, (req, res) => {
+    res.json(stats.getInventory(req.authAddress));
+});
+
+app.post('/api/account/inventory/use', requireAuth, (req, res) => {
+    const result = stats.useItem(req.authAddress, req.body.itemId);
+    if (result.error) {
+        res.status(400).json(result);
+        return;
+    }
+    res.json(result);
+});
+
 app.get('/api/hash-wars', (req, res) => {
     res.json(stats.getHashWarsState());
 });
 
-app.put('/api/hash-wars/worker/:workerName', (req, res) => {
+app.put('/api/hash-wars/worker/:workerName', requireWorkerAuth, (req, res) => {
     const worker = stats.setWorkerIdentity(req.params.workerName, {
         callsign: req.body.callsign,
         faction: req.body.faction,
@@ -417,10 +511,7 @@ app.put('/api/hash-wars/worker/:workerName', (req, res) => {
     res.json(worker);
 });
 
-app.put('/api/miner/:address/payout-settings', (req, res) => {
-    if (!requirePayoutAdmin(req, res)) {
-        return;
-    }
+app.put('/api/miner/:address/payout-settings', requireAddressAuth, (req, res) => {
     const preferences = stats.setAddressPayoutPreferences(req.params.address, {
         autoPayout: req.body.autoPayout,
         payoutThreshold: req.body.payoutThreshold
@@ -428,10 +519,7 @@ app.put('/api/miner/:address/payout-settings', (req, res) => {
     res.json(preferences);
 });
 
-app.post('/api/miner/:address/payout', async (req, res) => {
-    if (!requirePayoutAdmin(req, res)) {
-        return;
-    }
+app.post('/api/miner/:address/payout', requireAddressAuth, async (req, res) => {
     try {
         const result = await processAddressPayout(req.params.address);
         if (!result.paid) {

@@ -1,8 +1,824 @@
 {
   "startedAt": "2026-05-18T04:49:15.281Z",
-  "updatedAt": "2026-05-18T05:06:01.818Z",
-  "workers": {},
-  "addresses": {},
+  "updatedAt": "2026-05-18T05:20:23.877Z",
+  "workers": {
+    "ETestAddress123456789.Rig01": {
+      "workername": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "callsign": "Phantom",
+      "faction": "iron-legion",
+      "territory": "Revenant Reach",
+      "stance": "assault",
+      "cosmetic": "standard",
+      "password": "mypassword123",
+      "valid": 60,
+      "invalid": 0,
+      "blocks": 0,
+      "hashrate": 429496729,
+      "roundshares": 60,
+      "totalshares": 60,
+      "lastsharetime": 1779081574633,
+      "firstseen": 1779081584614,
+      "lastseen": 1779081574633,
+      "paid": 0,
+      "unpaid": 0,
+      "payoutThreshold": 0,
+      "dailyHashrate": [
+        {
+          "timestamp": 1779080984616,
+          "hashrate": 0
+        },
+        {
+          "timestamp": 1779080994616,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081004617,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081014617,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081024618,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081034618,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081044618,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081054618,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081064619,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081074620,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081084620,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081094621,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081104621,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081114621,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081124622,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081134622,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081144622,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081154623,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081164624,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081174624,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081184625,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081194625,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081204625,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081214625,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081224626,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081234626,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081244626,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081254626,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081264626,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081274626,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081284626,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081294626,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081304627,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081314627,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081324627,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081334627,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081344628,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081354628,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081364628,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081374628,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081384628,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081394629,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081404629,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081414629,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081424629,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081434629,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081444630,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081454630,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081464630,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081474631,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081484631,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081494632,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081504632,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081514632,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081524632,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081534632,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081544632,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081554633,
+          "hashrate": 429453784
+        },
+        {
+          "timestamp": 1779081564633,
+          "hashrate": 429496729
+        },
+        {
+          "timestamp": 1779081574633,
+          "hashrate": 429496729
+        }
+      ],
+      "historicalShareTimes": [
+        {
+          "timestamp": 1779080984616,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779080994616,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081004617,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081014617,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081024618,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081034618,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081044618,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081054618,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081064619,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081074620,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081084620,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081094621,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081104621,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081114621,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081124622,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081134622,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081144622,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081154623,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081164624,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081174624,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081184625,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081194625,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081204625,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081214625,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081224626,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081234626,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081244626,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081254626,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081264626,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081274626,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081284626,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081294626,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081304627,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081314627,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081324627,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081334627,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081344628,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081354628,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081364628,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081374628,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081384628,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081394629,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081404629,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081414629,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081424629,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081434629,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081444630,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081454630,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081464630,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081474631,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081484631,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081494632,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081504632,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081514632,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081524632,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081534632,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081544632,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081554633,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081564633,
+          "difficulty": 1
+        },
+        {
+          "timestamp": 1779081574633,
+          "difficulty": 1
+        }
+      ],
+      "identityUpdatedAt": 1779081623877
+    },
+    "ETestAddress123456789.Rig02": {
+      "workername": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "callsign": "Rig02",
+      "faction": "iron-legion",
+      "territory": "Forge Moon",
+      "stance": "assault",
+      "cosmetic": "standard",
+      "password": "otherpassword",
+      "valid": 30,
+      "invalid": 0,
+      "blocks": 0,
+      "hashrate": 214748364,
+      "roundshares": 30,
+      "totalshares": 30,
+      "lastsharetime": 1779081574639,
+      "firstseen": 1779081584615,
+      "lastseen": 1779081574639,
+      "paid": 0,
+      "unpaid": 0,
+      "payoutThreshold": 0,
+      "dailyHashrate": [
+        {
+          "timestamp": 1779081284633,
+          "hashrate": 0
+        },
+        {
+          "timestamp": 1779081294633,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081304633,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081314633,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081324634,
+          "hashrate": 214726892
+        },
+        {
+          "timestamp": 1779081334634,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081344634,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081354634,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081364634,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081374635,
+          "hashrate": 214726892
+        },
+        {
+          "timestamp": 1779081384635,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081394636,
+          "hashrate": 214726892
+        },
+        {
+          "timestamp": 1779081404636,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081414636,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081424636,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081434637,
+          "hashrate": 214726892
+        },
+        {
+          "timestamp": 1779081444637,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081454637,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081464637,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081474637,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081484637,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081494638,
+          "hashrate": 214726892
+        },
+        {
+          "timestamp": 1779081504638,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081514638,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081524638,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081534638,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081544639,
+          "hashrate": 214726892
+        },
+        {
+          "timestamp": 1779081554639,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081564639,
+          "hashrate": 214748364
+        },
+        {
+          "timestamp": 1779081574639,
+          "hashrate": 214748364
+        }
+      ],
+      "historicalShareTimes": [
+        {
+          "timestamp": 1779081284633,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081294633,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081304633,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081314633,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081324634,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081334634,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081344634,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081354634,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081364634,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081374635,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081384635,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081394636,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081404636,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081414636,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081424636,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081434637,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081444637,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081454637,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081464637,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081474637,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081484637,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081494638,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081504638,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081514638,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081524638,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081534638,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081544639,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081554639,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081564639,
+          "difficulty": 0.5
+        },
+        {
+          "timestamp": 1779081574639,
+          "difficulty": 0.5
+        }
+      ]
+    }
+  },
+  "addresses": {
+    "ETestAddress123456789": {
+      "address": "ETestAddress123456789",
+      "autoPayout": false,
+      "payoutThreshold": 0,
+      "inventory": [
+        {
+          "id": "entropy-shard",
+          "name": "Entropy Shard",
+          "type": "material",
+          "rarity": "common",
+          "quantity": 1,
+          "firstGrantedAt": 1779081584631,
+          "lastGrantedAt": 1779081584631
+        }
+      ],
+      "xp": 0,
+      "sharesMilestone": 50,
+      "uptimeMilestone": 0,
+      "createdAt": 1779081584615,
+      "updatedAt": 1779081584615,
+      "inventoryLog": [
+        {
+          "itemId": "entropy-shard",
+          "quantity": 1,
+          "source": "share_milestone",
+          "timestamp": 1779081584631
+        }
+      ]
+    }
+  },
+  "authTokens": {
+    "cdc9944597ee32931c2ba2b0e71205ea7e0e6a3f9bf5499dc262c1ade77519b9": {
+      "address": "ETestAddress123456789",
+      "createdAt": 1779081614914,
+      "expiresAt": 1779686414914
+    },
+    "2798bad78193c6dd18f61c54786b3a4558634f618a719bfd67f7ed6574a60a7f": {
+      "address": "ETestAddress123456789",
+      "createdAt": 1779081614980,
+      "expiresAt": 1779686414980
+    }
+  },
   "hashWars": {
     "season": {
       "name": "Season 0: Genesis Skirmish",
@@ -674,14 +1490,825 @@
     ],
     "battleLog": []
   },
-  "shares": [],
+  "shares": [
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100000,
+      "difficulty": 1,
+      "submittedAt": 1779080984616
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100001,
+      "difficulty": 1,
+      "submittedAt": 1779080994616
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100002,
+      "difficulty": 1,
+      "submittedAt": 1779081004617
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100003,
+      "difficulty": 1,
+      "submittedAt": 1779081014617
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100004,
+      "difficulty": 1,
+      "submittedAt": 1779081024618
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100005,
+      "difficulty": 1,
+      "submittedAt": 1779081034618
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100006,
+      "difficulty": 1,
+      "submittedAt": 1779081044618
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100007,
+      "difficulty": 1,
+      "submittedAt": 1779081054618
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100008,
+      "difficulty": 1,
+      "submittedAt": 1779081064619
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100009,
+      "difficulty": 1,
+      "submittedAt": 1779081074620
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100010,
+      "difficulty": 1,
+      "submittedAt": 1779081084620
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100011,
+      "difficulty": 1,
+      "submittedAt": 1779081094621
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100012,
+      "difficulty": 1,
+      "submittedAt": 1779081104621
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100013,
+      "difficulty": 1,
+      "submittedAt": 1779081114621
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100014,
+      "difficulty": 1,
+      "submittedAt": 1779081124622
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100015,
+      "difficulty": 1,
+      "submittedAt": 1779081134622
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100016,
+      "difficulty": 1,
+      "submittedAt": 1779081144622
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100017,
+      "difficulty": 1,
+      "submittedAt": 1779081154623
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100018,
+      "difficulty": 1,
+      "submittedAt": 1779081164624
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100019,
+      "difficulty": 1,
+      "submittedAt": 1779081174624
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100020,
+      "difficulty": 1,
+      "submittedAt": 1779081184625
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100021,
+      "difficulty": 1,
+      "submittedAt": 1779081194625
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100022,
+      "difficulty": 1,
+      "submittedAt": 1779081204625
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100023,
+      "difficulty": 1,
+      "submittedAt": 1779081214625
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100024,
+      "difficulty": 1,
+      "submittedAt": 1779081224626
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100025,
+      "difficulty": 1,
+      "submittedAt": 1779081234626
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100026,
+      "difficulty": 1,
+      "submittedAt": 1779081244626
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100027,
+      "difficulty": 1,
+      "submittedAt": 1779081254626
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100028,
+      "difficulty": 1,
+      "submittedAt": 1779081264626
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100029,
+      "difficulty": 1,
+      "submittedAt": 1779081274626
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100030,
+      "difficulty": 1,
+      "submittedAt": 1779081284626
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100031,
+      "difficulty": 1,
+      "submittedAt": 1779081294626
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100032,
+      "difficulty": 1,
+      "submittedAt": 1779081304627
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100033,
+      "difficulty": 1,
+      "submittedAt": 1779081314627
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100034,
+      "difficulty": 1,
+      "submittedAt": 1779081324627
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100035,
+      "difficulty": 1,
+      "submittedAt": 1779081334627
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100036,
+      "difficulty": 1,
+      "submittedAt": 1779081344628
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100037,
+      "difficulty": 1,
+      "submittedAt": 1779081354628
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100038,
+      "difficulty": 1,
+      "submittedAt": 1779081364628
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100039,
+      "difficulty": 1,
+      "submittedAt": 1779081374628
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100040,
+      "difficulty": 1,
+      "submittedAt": 1779081384628
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100041,
+      "difficulty": 1,
+      "submittedAt": 1779081394629
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100042,
+      "difficulty": 1,
+      "submittedAt": 1779081404629
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100043,
+      "difficulty": 1,
+      "submittedAt": 1779081414629
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100044,
+      "difficulty": 1,
+      "submittedAt": 1779081424629
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100045,
+      "difficulty": 1,
+      "submittedAt": 1779081434629
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100046,
+      "difficulty": 1,
+      "submittedAt": 1779081444630
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100047,
+      "difficulty": 1,
+      "submittedAt": 1779081454630
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100048,
+      "difficulty": 1,
+      "submittedAt": 1779081464630
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100049,
+      "difficulty": 1,
+      "submittedAt": 1779081474631
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100050,
+      "difficulty": 1,
+      "submittedAt": 1779081484631
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100051,
+      "difficulty": 1,
+      "submittedAt": 1779081494632
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100052,
+      "difficulty": 1,
+      "submittedAt": 1779081504632
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100053,
+      "difficulty": 1,
+      "submittedAt": 1779081514632
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100054,
+      "difficulty": 1,
+      "submittedAt": 1779081524632
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100055,
+      "difficulty": 1,
+      "submittedAt": 1779081534632
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100056,
+      "difficulty": 1,
+      "submittedAt": 1779081544632
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100057,
+      "difficulty": 1,
+      "submittedAt": 1779081554633
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100058,
+      "difficulty": 1,
+      "submittedAt": 1779081564633
+    },
+    {
+      "worker": "ETestAddress123456789.Rig01",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100059,
+      "difficulty": 1,
+      "submittedAt": 1779081574633
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100050,
+      "difficulty": 0.5,
+      "submittedAt": 1779081284633
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100051,
+      "difficulty": 0.5,
+      "submittedAt": 1779081294633
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100052,
+      "difficulty": 0.5,
+      "submittedAt": 1779081304633
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100053,
+      "difficulty": 0.5,
+      "submittedAt": 1779081314633
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100054,
+      "difficulty": 0.5,
+      "submittedAt": 1779081324634
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100055,
+      "difficulty": 0.5,
+      "submittedAt": 1779081334634
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100056,
+      "difficulty": 0.5,
+      "submittedAt": 1779081344634
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100057,
+      "difficulty": 0.5,
+      "submittedAt": 1779081354634
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100058,
+      "difficulty": 0.5,
+      "submittedAt": 1779081364634
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100059,
+      "difficulty": 0.5,
+      "submittedAt": 1779081374635
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100060,
+      "difficulty": 0.5,
+      "submittedAt": 1779081384635
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100061,
+      "difficulty": 0.5,
+      "submittedAt": 1779081394636
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100062,
+      "difficulty": 0.5,
+      "submittedAt": 1779081404636
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100063,
+      "difficulty": 0.5,
+      "submittedAt": 1779081414636
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100064,
+      "difficulty": 0.5,
+      "submittedAt": 1779081424636
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100065,
+      "difficulty": 0.5,
+      "submittedAt": 1779081434637
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100066,
+      "difficulty": 0.5,
+      "submittedAt": 1779081444637
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100067,
+      "difficulty": 0.5,
+      "submittedAt": 1779081454637
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100068,
+      "difficulty": 0.5,
+      "submittedAt": 1779081464637
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100069,
+      "difficulty": 0.5,
+      "submittedAt": 1779081474637
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100070,
+      "difficulty": 0.5,
+      "submittedAt": 1779081484637
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100071,
+      "difficulty": 0.5,
+      "submittedAt": 1779081494638
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100072,
+      "difficulty": 0.5,
+      "submittedAt": 1779081504638
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100073,
+      "difficulty": 0.5,
+      "submittedAt": 1779081514638
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100074,
+      "difficulty": 0.5,
+      "submittedAt": 1779081524638
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100075,
+      "difficulty": 0.5,
+      "submittedAt": 1779081534638
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100076,
+      "difficulty": 0.5,
+      "submittedAt": 1779081544639
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100077,
+      "difficulty": 0.5,
+      "submittedAt": 1779081554639
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100078,
+      "difficulty": 0.5,
+      "submittedAt": 1779081564639
+    },
+    {
+      "worker": "ETestAddress123456789.Rig02",
+      "address": "ETestAddress123456789",
+      "valid": true,
+      "block": false,
+      "height": 100079,
+      "difficulty": 0.5,
+      "submittedAt": 1779081574639
+    }
+  ],
   "blocks": [],
   "payouts": [],
   "networkHistory": [],
   "pool": {
-    "validShares": 0,
+    "validShares": 90,
     "invalidShares": 0,
-    "totalShares": 0,
+    "totalShares": 90,
     "totalBlocks": 0,
     "totalRewards": 0,
     "unpaid": 0,
