@@ -222,6 +222,59 @@ function renderMiner(summary) {
   }
 }
 
+function renderHashWars(state) {
+  if (!byId('wars-event-name')) {
+    return;
+  }
+
+  setText('wars-event-name', state.event.name);
+  setText('wars-event-description', state.event.description);
+  setText('wars-event-progress', state.event.progress + '%');
+  setText('wars-event-remaining', state.event.remaining + ' valid shares remaining');
+  if (byId('wars-event-bar')) {
+    byId('wars-event-bar').style.width = state.event.progress + '%';
+  }
+  setText('wars-units', state.totals.units);
+  setText('wars-active-units', state.totals.activeUnits);
+  setText('wars-hashrate', formatHashrate(state.totals.hashrate));
+  setText('wars-energy', state.totals.energy.toLocaleString());
+  setText('wars-blocks', state.totals.blocks);
+
+  var factions = byId('wars-factions');
+  factions.innerHTML = state.factions.map(function(faction) {
+    return '<article class="faction-card" style="--faction:' + escapeHtml(faction.color) + '">' +
+      '<span>' + escapeHtml(faction.motto) + '</span>' +
+      '<strong>' + escapeHtml(faction.name) + '</strong>' +
+      '<div class="meter-track"><div style="width:' + faction.influence + '%"></div></div>' +
+      '<small>' + formatHashrate(faction.hashrate) + ' | ' + faction.activeUnits + ' active | ' + faction.influence + '% influence</small>' +
+      '</article>';
+  }).join('');
+
+  var territories = byId('wars-territories');
+  territories.innerHTML = state.territories.map(function(territory) {
+    return '<article class="territory-card">' +
+      '<span>' + escapeHtml(territory.status) + '</span>' +
+      '<strong>' + escapeHtml(territory.name) + '</strong>' +
+      '<small>' + escapeHtml(territory.ownerName) + ' control: ' + territory.control + '%</small>' +
+      '</article>';
+  }).join('');
+
+  var units = byId('wars-units-list');
+  units.innerHTML = state.units.length ? state.units.map(function(unit) {
+    return '<article class="unit-card ' + (unit.active ? 'active' : '') + '">' +
+      '<span>' + escapeHtml(unit.className) + ' / ' + escapeHtml(unit.faction) + '</span>' +
+      '<strong>' + escapeHtml(unit.callsign) + '</strong>' +
+      '<small>' + escapeHtml(unit.workername) + '</small>' +
+      '<div class="unit-stats">' +
+      '<div><span>ATK</span><strong>' + unit.attack + '</strong></div>' +
+      '<div><span>SHD</span><strong>' + unit.shield + '</strong></div>' +
+      '<div><span>ENG</span><strong>' + unit.energy + '</strong></div>' +
+      '<div><span>EFF</span><strong>' + Math.round(unit.efficiency * 100) + '%</strong></div>' +
+      '</div>' +
+      '</article>';
+  }).join('') : '<p class="empty">No combat units enlisted yet. Connect a miner to enter the war.</p>';
+}
+
 async function refresh() {
   var health = byId('health');
   try {
@@ -237,6 +290,9 @@ async function refresh() {
     ];
     if (address) {
       requests.push(getJson('/api/miner/' + encodeURIComponent(address)));
+    }
+    if (byId('wars-event-name')) {
+      requests.push(getJson('/api/hash-wars'));
     }
     var results = await Promise.all(requests);
 
@@ -259,6 +315,9 @@ async function refresh() {
     } else {
       if (byId('miner-panel')) byId('miner-panel').style.display = '';
       renderMiner({ address: '', totals: {}, preferences: { payoutThreshold: results[0].payoutThreshold || 0 }, payoutCandidates: { total: 0 } });
+    }
+    if (byId('wars-event-name')) {
+      renderHashWars(results[results.length - 1]);
     }
   } catch (error) {
     health.textContent = 'Dashboard error';

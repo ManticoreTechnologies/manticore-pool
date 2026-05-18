@@ -391,12 +391,28 @@ app.get('/proof', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'proof.html'));
 });
 
+app.get('/wars', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'wars.html'));
+});
+
 app.get('/payouts', (req, res) => {
     res.redirect('/proof');
 });
 
 app.get('/api/miner/:address', (req, res) => {
     res.json(stats.getAddressSummary(req.params.address, options.payoutMaturityConfirmations));
+});
+
+app.get('/api/hash-wars', (req, res) => {
+    res.json(stats.getHashWarsState());
+});
+
+app.put('/api/hash-wars/worker/:workerName', (req, res) => {
+    const worker = stats.setWorkerIdentity(req.params.workerName, {
+        callsign: req.body.callsign,
+        faction: req.body.faction
+    });
+    res.json(worker);
 });
 
 app.put('/api/miner/:address/payout-settings', (req, res) => {
