@@ -255,16 +255,16 @@ function renderHashWars(state) {
     return '<article class="territory-card">' +
       '<span>' + escapeHtml(territory.status) + '</span>' +
       '<strong>' + escapeHtml(territory.name) + '</strong>' +
-      '<small>' + escapeHtml(territory.ownerName) + ' control: ' + territory.control + '%</small>' +
+      '<small>' + escapeHtml(territory.ownerName) + ' control: ' + territory.control + '% | ' + escapeHtml(territory.buff) + '</small>' +
       '</article>';
   }).join('');
 
   var units = byId('wars-units-list');
   units.innerHTML = state.units.length ? state.units.map(function(unit) {
     return '<article class="unit-card ' + (unit.active ? 'active' : '') + '">' +
-      '<span>' + escapeHtml(unit.className) + ' / ' + escapeHtml(unit.faction) + '</span>' +
+      '<span>LVL ' + unit.level + ' ' + escapeHtml(unit.className) + ' / ' + escapeHtml(unit.factionName) + '</span>' +
       '<strong>' + escapeHtml(unit.callsign) + '</strong>' +
-      '<small>' + escapeHtml(unit.workername) + '</small>' +
+      '<small>' + escapeHtml(unit.workername) + ' | ' + escapeHtml(unit.territory) + ' | ' + escapeHtml(unit.stance) + ' | ' + escapeHtml(unit.archetype) + '</small>' +
       '<div class="unit-stats">' +
       '<div><span>ATK</span><strong>' + unit.attack + '</strong></div>' +
       '<div><span>SHD</span><strong>' + unit.shield + '</strong></div>' +
@@ -273,6 +273,56 @@ function renderHashWars(state) {
       '</div>' +
       '</article>';
   }).join('') : '<p class="empty">No combat units enlisted yet. Connect a miner to enter the war.</p>';
+
+  renderWarsCommand(state);
+  renderWarsBattleLog(state.battleLog || []);
+}
+
+function renderWarsCommand(state) {
+  if (!byId('wars-command-worker')) {
+    return;
+  }
+
+  var selected = byId('wars-command-worker').value;
+  byId('wars-command-worker').innerHTML = state.units.map(function(unit) {
+    return '<option value="' + escapeHtml(unit.workername) + '">' + escapeHtml(unit.callsign) + ' (' + escapeHtml(unit.className) + ')</option>';
+  }).join('');
+  if (selected) {
+    byId('wars-command-worker').value = selected;
+  }
+
+  byId('wars-command-faction').innerHTML = state.constants.factions.map(function(faction) {
+    return '<option value="' + escapeHtml(faction.id) + '">' + escapeHtml(faction.name) + '</option>';
+  }).join('');
+  byId('wars-command-territory').innerHTML = state.constants.territories.map(function(territory) {
+    return '<option value="' + escapeHtml(territory) + '">' + escapeHtml(territory) + '</option>';
+  }).join('');
+  byId('wars-command-stance').innerHTML = state.constants.stances.map(function(stance) {
+    return '<option value="' + escapeHtml(stance.id) + '">' + escapeHtml(stance.name) + '</option>';
+  }).join('');
+
+  var unit = state.units.find(function(item) { return item.workername === byId('wars-command-worker').value; }) || state.units[0];
+  if (unit) {
+    byId('wars-command-worker').value = unit.workername;
+    byId('wars-command-callsign').value = unit.callsign;
+    byId('wars-command-faction').value = unit.faction;
+    byId('wars-command-territory').value = unit.territory;
+    byId('wars-command-stance').value = unit.stance;
+  }
+}
+
+function renderWarsBattleLog(log) {
+  var container = byId('wars-battle-log');
+  if (!container) {
+    return;
+  }
+  if (!log.length) {
+    container.innerHTML = '<p class="empty">No war events logged yet. Keep hashing.</p>';
+    return;
+  }
+  container.innerHTML = log.slice(0, 12).map(function(entry) {
+    return '<article class="list-item"><strong>' + escapeHtml(entry.type) + '</strong><span>' + escapeHtml(entry.message) + '</span><small>' + new Date(entry.timestamp).toLocaleString() + '</small></article>';
+  }).join('');
 }
 
 async function refresh() {
@@ -485,6 +535,30 @@ Array.prototype.forEach.call(document.querySelectorAll('.copy-button'), function
     }
   });
 });
+if (byId('wars-command-worker')) {
+  byId('wars-command-worker').addEventListener('change', refresh);
+}
+if (byId('wars-command-save')) {
+  byId('wars-command-save').addEventListener('click', async function() {
+    var worker = byId('wars-command-worker').value;
+    if (!worker) {
+      setText('wars-command-message', 'No worker selected. Connect a miner first.');
+      return;
+    }
+    try {
+      await sendJson('/api/hash-wars/worker/' + encodeURIComponent(worker), 'PUT', {
+        callsign: byId('wars-command-callsign').value,
+        faction: byId('wars-command-faction').value,
+        territory: byId('wars-command-territory').value,
+        stance: byId('wars-command-stance').value
+      });
+      setText('wars-command-message', 'Deployment updated. Territory pressure will apply on the next war tick.');
+      refresh();
+    } catch (error) {
+      setText('wars-command-message', 'Deployment failed: ' + error.message);
+    }
+  });
+}
 
 var initialFilter = currentAddressFilter();
 if (initialFilter) {

@@ -81,8 +81,28 @@
     </section>
 
     <section class="panel mission-panel">
+      <div class="panel-header">
+        <div><p class="panel-kicker">// Command Console</p><h2>Deploy a unit</h2><p class="muted">Choose a worker, rename its callsign, pick a faction, assign a sector, and set its combat stance.</p></div>
+      </div>
+      <div class="wars-command-grid">
+        <label>Worker<select id="wars-command-worker"></select></label>
+        <label>Callsign<input id="wars-command-callsign" placeholder="NecroNoncer"></label>
+        <label>Faction<select id="wars-command-faction"></select></label>
+        <label>Sector<select id="wars-command-territory"></select></label>
+        <label>Stance<select id="wars-command-stance"></select></label>
+        <button id="wars-command-save">Deploy unit</button>
+      </div>
+      <p class="muted console-message" id="wars-command-message">No fake power: deployments change where real mining telemetry applies pressure.</p>
+    </section>
+
+    <section class="panel mission-panel">
       <div class="panel-header"><div><p class="panel-kicker">// Combat Roster</p><h2>Top rigs entering battle</h2><p class="muted">Scouts, gladiators, dreadnoughts, and titans ranked by real telemetry.</p></div></div>
       <div id="wars-units-list" class="unit-grid"></div>
+    </section>
+
+    <section class="panel mission-panel">
+      <div class="panel-header"><div><p class="panel-kicker">// Battle Log</p><h2>Latest war events</h2><p class="muted">Territory flips and boss breaches generated from pool activity.</p></div></div>
+      <div id="wars-battle-log" class="list"></div>
     </section>
   </main>
 

@@ -730,6 +730,23 @@ code {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.wars-command-grid {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wars-command-grid label {
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+}
+
+.wars-command-grid button {
+  min-height: 45px;
+}
+
 .faction-card,
 .territory-card,
 .unit-card {
@@ -1197,7 +1214,8 @@ td small {
 
   .faction-grid,
   .territory-grid,
-  .unit-grid {
+  .unit-grid,
+  .wars-command-grid {
     grid-template-columns: 1fr;
   }
 }

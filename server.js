@@ -410,7 +410,9 @@ app.get('/api/hash-wars', (req, res) => {
 app.put('/api/hash-wars/worker/:workerName', (req, res) => {
     const worker = stats.setWorkerIdentity(req.params.workerName, {
         callsign: req.body.callsign,
-        faction: req.body.faction
+        faction: req.body.faction,
+        territory: req.body.territory,
+        stance: req.body.stance
     });
     res.json(worker);
 });
