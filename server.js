@@ -379,6 +379,22 @@ app.get('/api/workers/:address', (req, res) => {
     res.json(stats.getWorkersByAddress(req.params.address));
 });
 
+app.get('/connect', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'connect.html'));
+});
+
+app.get('/miner', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'miner.html'));
+});
+
+app.get('/proof', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'proof.html'));
+});
+
+app.get('/payouts', (req, res) => {
+    res.redirect('/proof');
+});
+
 app.get('/api/miner/:address', (req, res) => {
     res.json(stats.getAddressSummary(req.params.address, options.payoutMaturityConfirmations));
 });
@@ -412,7 +428,7 @@ app.post('/api/miner/:address/payout', async (req, res) => {
 
 app.get('/dashboard/:address', (req, res) => {
     if (req.accepts('html')) {
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+        res.sendFile(path.join(__dirname, 'public', 'miner.html'));
         return;
     }
     res.json(stats.getWorkersByAddress(req.params.address));

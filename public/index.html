@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Manticore EVR Mission Control</title>
+  <title>Manticore EVR Pool Console</title>
   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
+<body data-page="home">
   <div class="starscape" aria-hidden="true"></div>
   <div class="grid-overlay" aria-hidden="true"></div>
   <div class="scanline" aria-hidden="true"></div>
@@ -14,40 +14,18 @@
   <header class="site-bar">
     <a class="brand-lockup" href="/">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span>
-        <strong>Manticore</strong>
-        <small>Technology</small>
-      </span>
+      <span><strong>Manticore</strong><small>Technology</small></span>
     </a>
     <button class="menu-button" id="menu-button" type="button" aria-label="Pool menu" aria-expanded="false">☰</button>
   </header>
 
   <aside class="nav-overlay" id="nav-overlay" aria-hidden="true">
     <div class="nav-panel">
-      <div class="nav-topline">
-        <p class="eyebrow">// Navigation</p>
-        <button class="nav-close" id="nav-close" type="button" aria-label="Close menu">×</button>
-      </div>
-      <a href="/" class="nav-item">
-        <span>01</span>
-        <strong>Pool Console</strong>
-        <small>Telemetry, network status, and pool-wide proof trail.</small>
-      </a>
-      <a href="#connect" class="nav-item">
-        <span>02</span>
-        <strong>Connect Rig</strong>
-        <small>Build your MRR profile, worker name, and stratum endpoint.</small>
-      </a>
-      <a href="#miner-panel" class="nav-item">
-        <span>03</span>
-        <strong>Miner Dashboard</strong>
-        <small>Workers, balances, payout settings, and manual payout controls.</small>
-      </a>
-      <a href="#blocks" class="nav-item">
-        <span>04</span>
-        <strong>Proof Trail</strong>
-        <small>Block radar and payout ledger.</small>
-      </a>
+      <div class="nav-topline"><p class="eyebrow">// Navigation</p><button class="nav-close" id="nav-close" type="button" aria-label="Close menu">×</button></div>
+      <a href="/" class="nav-item"><span>01</span><strong>Pool Console</strong><small>Telemetry, network status, and system posture.</small></a>
+      <a href="/connect" class="nav-item"><span>02</span><strong>Connect Rig</strong><small>Build MRR profile, worker name, and stratum endpoint.</small></a>
+      <a href="/miner" class="nav-item"><span>03</span><strong>Miner Dashboard</strong><small>Workers, balances, payout settings, and manual payout controls.</small></a>
+      <a href="/proof" class="nav-item"><span>04</span><strong>Proof Trail</strong><small>Block radar and payout ledger.</small></a>
     </div>
   </aside>
 
@@ -57,40 +35,33 @@
       <h1><span>Manticore</span> Pool</h1>
       <p class="muted hero-statement">Verifiable mining infrastructure for the Evrmore ecosystem: live stratum telemetry, signed payout accounting, and operational evidence you can inspect.</p>
     </div>
-
     <div class="command-status">
       <div class="status online" id="health">Connecting...</div>
-      <div class="mission-clock">
-        <span>UTC</span>
-        <strong id="mission-time">--:--:--</strong>
-      </div>
+      <div class="mission-clock"><span>UTC</span><strong id="mission-time">--:--:--</strong></div>
     </div>
   </header>
 
   <main class="mission-shell">
     <nav class="tabs">
       <a href="/" id="home-link">Pool Console</a>
-      <a href="#connect" id="connect-link">Connect Rig</a>
-      <a href="#" id="miner-link">Miner Dashboard</a>
-      <a href="/api/payouts">Payout Ledger</a>
+      <a href="/connect" id="connect-link">Connect Rig</a>
+      <a href="/miner" id="miner-link">Miner Dashboard</a>
+      <a href="/proof">Proof Trail</a>
     </nav>
 
     <section class="hero-console">
       <div class="orbital-core">
         <div class="orbital-ring ring-one"></div>
         <div class="orbital-ring ring-two"></div>
-        <div class="orbital-center">
-          <span>EVR</span>
-          <strong>TRUST</strong>
-        </div>
+        <div class="orbital-center"><span>EVR</span><strong>TRUST</strong></div>
       </div>
       <div class="console-copy">
-        <p class="eyebrow">// Mining Surface</p>
+        <p class="eyebrow">// Pool Surface</p>
         <h2>Systems that prove themselves</h2>
         <p class="muted">Signal lock, payout ledger, worker manifest, and network radar are synchronized from this pool instance. Trust comes from traceable state, not a tagline.</p>
         <div class="hero-actions">
-          <a href="#miner-panel">Miner console</a>
-          <a href="#blocks">Proof trail</a>
+          <a href="/connect">Connect a rig</a>
+          <a href="/proof">Inspect proof trail</a>
         </div>
       </div>
       <div class="signal-stack">
@@ -101,125 +72,23 @@
     </section>
 
     <section class="trust-strip">
-      <div>
-        <span>// Pillar 1</span>
-        <strong>Proof over promise</strong>
-      </div>
-      <div>
-        <span>// Pillar 2</span>
-        <strong>Deterministic payouts</strong>
-      </div>
-      <div>
-        <span>// Pillar 3</span>
-        <strong>Local-first state</strong>
-      </div>
+      <div><span>// Pillar 1</span><strong>Proof over promise</strong></div>
+      <div><span>// Pillar 2</span><strong>Deterministic payouts</strong></div>
+      <div><span>// Pillar 3</span><strong>Local-first state</strong></div>
     </section>
 
     <section class="grid cards">
-      <article class="telemetry-card">
-        <span>Pool Hashrate</span>
-        <strong id="pool-hashrate">0 H/s</strong>
-        <small>Array throughput</small>
-      </article>
-      <article class="telemetry-card">
-        <span>Active Miners</span>
-        <strong id="active-miners">0</strong>
-        <small>Connected crews</small>
-      </article>
-      <article class="telemetry-card">
-        <span>Blocks Found</span>
-        <strong id="blocks-found">0</strong>
-        <small>Candidate captures</small>
-      </article>
-      <article class="telemetry-card">
-        <span>Valid / Invalid Shares</span>
-        <strong><span id="valid-shares">0</span> / <span id="invalid-shares">0</span></strong>
-        <small>Signal integrity</small>
-      </article>
-      <article class="telemetry-card">
-        <span>Unpaid / Paid</span>
-        <strong><span id="pool-unpaid">0 EVR</span></strong>
-        <small id="pool-paid">0 EVR paid</small>
-      </article>
-    </section>
-
-    <section class="connect-experience" id="connect">
-      <div class="connect-bg-orbit" aria-hidden="true"></div>
-      <div class="connect-copy">
-        <p class="eyebrow">// Rig Onboarding</p>
-        <h2>Connect your miner without guesswork</h2>
-        <p class="muted">Enter your payout address and worker label. Mission Control generates the MiningRigRentals fields and full stratum URI, then lets you copy each value.</p>
-      </div>
-
-      <div class="connect-console">
-        <div class="connect-steps">
-          <div class="step active"><span>01</span><strong>Endpoint</strong><small>Pick stratum port</small></div>
-          <div class="step"><span>02</span><strong>Identity</strong><small>Address + worker</small></div>
-          <div class="step"><span>03</span><strong>Launch</strong><small>Copy config</small></div>
-        </div>
-
-        <div class="connect-form">
-          <label>
-            Pool host
-            <input id="connect-host" placeholder="18.217.251.227">
-          </label>
-          <label>
-            Stratum port
-            <select id="connect-port">
-              <option value="3333">3333 - standard</option>
-              <option value="3334">3334 - alternate</option>
-            </select>
-          </label>
-          <label>
-            EVR payout address
-            <input id="connect-address" placeholder="E...">
-          </label>
-          <label>
-            Worker label
-            <input id="connect-worker" placeholder="Rig01">
-          </label>
-          <label>
-            Password
-            <input id="connect-password" placeholder="x" value="x">
-          </label>
-          <label>
-            Miner profile
-            <select id="connect-profile">
-              <option value="mrr">MiningRigRentals</option>
-              <option value="generic">Generic stratum miner</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="launch-card">
-          <div>
-            <span>MRR Pool Host:Port</span>
-            <code id="connect-mrr-host">host:3333</code>
-            <button class="copy-button" data-copy-target="connect-mrr-host">Copy host</button>
-          </div>
-          <div>
-            <span>Workername</span>
-            <code id="connect-workername">E....Rig01</code>
-            <button class="copy-button" data-copy-target="connect-workername">Copy worker</button>
-          </div>
-          <div>
-            <span>Full stratum URI</span>
-            <code id="connect-uri">stratum+tcp://E....Rig01:x@host:3333</code>
-            <button class="copy-button" data-copy-target="connect-uri">Copy URI</button>
-          </div>
-          <p class="muted" id="connect-hint">For MRR, use host:port without the stratum+tcp:// prefix in the host field.</p>
-        </div>
-      </div>
+      <article class="telemetry-card"><span>Pool Hashrate</span><strong id="pool-hashrate">0 H/s</strong><small>Array throughput</small></article>
+      <article class="telemetry-card"><span>Active Miners</span><strong id="active-miners">0</strong><small>Connected crews</small></article>
+      <article class="telemetry-card"><span>Blocks Found</span><strong id="blocks-found">0</strong><small>Candidate captures</small></article>
+      <article class="telemetry-card"><span>Valid / Invalid Shares</span><strong><span id="valid-shares">0</span> / <span id="invalid-shares">0</span></strong><small>Signal integrity</small></article>
+      <article class="telemetry-card"><span>Unpaid / Paid</span><strong><span id="pool-unpaid">0 EVR</span></strong><small id="pool-paid">0 EVR paid</small></article>
     </section>
 
     <section class="mission-grid">
       <section class="panel mission-panel network-panel">
         <div class="panel-header">
-          <div>
-            <p class="panel-kicker">// Network Radar</p>
-            <h2>Evrmore link status</h2>
-            <p class="muted">Connected core-node telemetry and pool network share.</p>
-          </div>
+          <div><p class="panel-kicker">// Network Radar</p><h2>Evrmore link status</h2><p class="muted">Connected core-node telemetry and pool network share.</p></div>
           <button id="refresh">Refresh telemetry</button>
         </div>
         <div class="grid stats">
@@ -231,97 +100,15 @@
       </section>
 
       <aside class="panel mission-panel uplink-panel">
-        <p class="panel-kicker">// Address Uplink</p>
-        <h2>Address uplink</h2>
-        <p class="muted">Enter a payout address or open <code>/dashboard/E...</code> for a miner-specific command view with payout controls.</p>
-        <input id="address-filter" placeholder="Filter by payout address">
-        <div class="uplink-readout">
-          <span>Selected address</span>
-          <strong id="selected-address-readout">Pool-wide</strong>
+        <p class="panel-kicker">// System Links</p>
+        <h2>Operational pages</h2>
+        <p class="muted">The interface is now split into focused surfaces for pool operators and miners.</p>
+        <div class="signal-stack">
+          <div><span>Rig onboarding</span><strong><a href="/connect">/connect</a></strong></div>
+          <div><span>Miner console</span><strong><a href="/miner">/miner</a></strong></div>
+          <div><span>Proof ledger</span><strong><a href="/proof">/proof</a></strong></div>
         </div>
       </aside>
-    </section>
-
-    <section class="panel mission-panel" id="miner-panel">
-      <div class="panel-header">
-        <div>
-          <p class="panel-kicker">// Miner Bay</p>
-          <h2>Per-address command console</h2>
-          <p class="muted">Worker manifest, payout balance, manual payout, and automatic payout settings.</p>
-        </div>
-        <input id="miner-address" placeholder="Enter EVR payout address">
-      </div>
-
-      <div class="grid stats">
-        <div><span>Address</span><strong id="miner-address-label">-</strong></div>
-        <div><span>Miner Hashrate</span><strong id="miner-hashrate">0 H/s</strong></div>
-        <div><span>Unpaid Balance</span><strong id="miner-unpaid">0 EVR</strong></div>
-        <div><span>Eligible Mature Payout</span><strong id="miner-eligible">0 EVR</strong></div>
-      </div>
-
-      <div class="settings-grid">
-        <label class="toggle">
-          <input type="checkbox" id="auto-payout">
-          <span>Auto payout enabled for this address</span>
-        </label>
-        <label>
-          Payout threshold (EVR)
-          <input id="payout-threshold" type="number" min="0" step="0.00000001">
-        </label>
-        <button id="save-payout-settings">Save settings</button>
-        <button id="manual-payout">Manual payout</button>
-      </div>
-      <p class="muted console-message" id="payout-message">Payout controls are in standby until an address is selected.</p>
-    </section>
-
-    <section class="panel mission-panel">
-      <div class="panel-header">
-        <div>
-          <p class="panel-kicker">// Worker Manifest</p>
-          <h2>Rig telemetry</h2>
-          <p class="muted">All workers for the pool or selected payout address.</p>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Worker</th>
-              <th>Hashrate</th>
-              <th>Valid</th>
-              <th>Invalid</th>
-              <th>Blocks</th>
-              <th>Unpaid</th>
-              <th>Last Share</th>
-            </tr>
-          </thead>
-          <tbody id="workers"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="mission-grid">
-      <section class="panel mission-panel">
-        <div class="panel-header">
-          <div>
-            <p class="panel-kicker">// Block Radar</p>
-            <h2>Recent block candidates</h2>
-            <p class="muted">Submitted candidates, reward accounting, and maturity status.</p>
-          </div>
-        </div>
-        <div id="blocks" class="list"></div>
-      </section>
-
-      <section class="panel mission-panel">
-        <div class="panel-header">
-          <div>
-            <p class="panel-kicker">// Payout Ledger</p>
-            <h2>Recent payouts</h2>
-            <p class="muted">Wallet transactions sent by the payout worker.</p>
-          </div>
-        </div>
-        <div id="payouts" class="list"></div>
-      </section>
     </section>
   </main>
 

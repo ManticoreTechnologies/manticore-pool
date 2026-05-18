@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Miner Dashboard | Manticore EVR Pool</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body data-page="miner">
+  <div class="starscape" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="site-bar">
+    <a class="brand-lockup" href="/"><span class="brand-mark" aria-hidden="true"></span><span><strong>Manticore</strong><small>Technology</small></span></a>
+    <button class="menu-button" id="menu-button" type="button" aria-label="Pool menu" aria-expanded="false">☰</button>
+  </header>
+  <aside class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-panel">
+      <div class="nav-topline"><p class="eyebrow">// Navigation</p><button class="nav-close" id="nav-close" type="button" aria-label="Close menu">×</button></div>
+      <a href="/" class="nav-item"><span>01</span><strong>Pool Console</strong><small>Pool-wide telemetry.</small></a>
+      <a href="/connect" class="nav-item"><span>02</span><strong>Connect Rig</strong><small>Generate connection fields.</small></a>
+      <a href="/miner" class="nav-item"><span>03</span><strong>Miner Dashboard</strong><small>Workers, balances, payout settings.</small></a>
+      <a href="/proof" class="nav-item"><span>04</span><strong>Proof Trail</strong><small>Blocks and payouts.</small></a>
+    </div>
+  </aside>
+
+  <header class="command-header">
+    <div class="mission-title">
+      <p class="eyebrow">Manticore EVR / Miner Bay</p>
+      <h1><span>Miner</span> Dashboard</h1>
+      <p class="muted hero-statement">Per-address worker telemetry, payout preferences, manual payout controls, and mature-balance visibility.</p>
+    </div>
+    <div class="command-status">
+      <div class="status online" id="health">Connecting...</div>
+      <div class="mission-clock"><span>UTC</span><strong id="mission-time">--:--:--</strong></div>
+    </div>
+  </header>
+
+  <main class="mission-shell">
+    <nav class="tabs">
+      <a href="/">Pool Console</a>
+      <a href="/connect">Connect Rig</a>
+      <a href="/miner" id="miner-link">Miner Dashboard</a>
+      <a href="/proof">Proof Trail</a>
+    </nav>
+
+    <section class="mission-grid">
+      <aside class="panel mission-panel uplink-panel">
+        <p class="panel-kicker">// Address Uplink</p>
+        <h2>Select miner address</h2>
+        <p class="muted">Enter a payout address or open <code>/dashboard/E...</code>.</p>
+        <input id="address-filter" placeholder="Filter by payout address">
+        <div class="uplink-readout"><span>Selected address</span><strong id="selected-address-readout">Pool-wide</strong></div>
+      </aside>
+
+      <section class="panel mission-panel" id="miner-panel">
+        <div class="panel-header">
+          <div><p class="panel-kicker">// Miner Bay</p><h2>Per-address command console</h2><p class="muted">Worker manifest, payout balance, manual payout, and automatic payout settings.</p></div>
+          <input id="miner-address" placeholder="Enter EVR payout address">
+        </div>
+        <div class="grid stats">
+          <div><span>Address</span><strong id="miner-address-label">-</strong></div>
+          <div><span>Miner Hashrate</span><strong id="miner-hashrate">0 H/s</strong></div>
+          <div><span>Unpaid Balance</span><strong id="miner-unpaid">0 EVR</strong></div>
+          <div><span>Eligible Mature Payout</span><strong id="miner-eligible">0 EVR</strong></div>
+        </div>
+        <div class="settings-grid">
+          <label class="toggle"><input type="checkbox" id="auto-payout"><span>Auto payout enabled for this address</span></label>
+          <label>Payout threshold (EVR)<input id="payout-threshold" type="number" min="0" step="0.00000001"></label>
+          <button id="save-payout-settings">Save settings</button>
+          <button id="manual-payout">Manual payout</button>
+        </div>
+        <p class="muted console-message" id="payout-message">Payout controls are in standby until an address is selected.</p>
+      </section>
+    </section>
+
+    <section class="panel mission-panel">
+      <div class="panel-header"><div><p class="panel-kicker">// Worker Manifest</p><h2>Rig telemetry</h2><p class="muted">Workers for the selected payout address.</p></div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Worker</th><th>Hashrate</th><th>Valid</th><th>Invalid</th><th>Blocks</th><th>Unpaid</th><th>Last Share</th></tr></thead>
+          <tbody id="workers"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

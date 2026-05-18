@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proof Trail | Manticore EVR Pool</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body data-page="proof">
+  <div class="starscape" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="site-bar">
+    <a class="brand-lockup" href="/"><span class="brand-mark" aria-hidden="true"></span><span><strong>Manticore</strong><small>Technology</small></span></a>
+    <button class="menu-button" id="menu-button" type="button" aria-label="Pool menu" aria-expanded="false">☰</button>
+  </header>
+  <aside class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-panel">
+      <div class="nav-topline"><p class="eyebrow">// Navigation</p><button class="nav-close" id="nav-close" type="button" aria-label="Close menu">×</button></div>
+      <a href="/" class="nav-item"><span>01</span><strong>Pool Console</strong><small>Pool-wide telemetry.</small></a>
+      <a href="/connect" class="nav-item"><span>02</span><strong>Connect Rig</strong><small>Generate connection fields.</small></a>
+      <a href="/miner" class="nav-item"><span>03</span><strong>Miner Dashboard</strong><small>Workers and payouts.</small></a>
+      <a href="/proof" class="nav-item"><span>04</span><strong>Proof Trail</strong><small>Blocks and payouts.</small></a>
+    </div>
+  </aside>
+
+  <header class="command-header">
+    <div class="mission-title">
+      <p class="eyebrow">Manticore EVR / Proof Trail</p>
+      <h1><span>Proof</span> Ledger</h1>
+      <p class="muted hero-statement">Block candidate history, maturity status, payout transactions, and pool accounting evidence.</p>
+    </div>
+    <div class="command-status">
+      <div class="status online" id="health">Connecting...</div>
+      <div class="mission-clock"><span>UTC</span><strong id="mission-time">--:--:--</strong></div>
+    </div>
+  </header>
+
+  <main class="mission-shell">
+    <nav class="tabs">
+      <a href="/">Pool Console</a>
+      <a href="/connect">Connect Rig</a>
+      <a href="/miner" id="miner-link">Miner Dashboard</a>
+      <a href="/proof">Proof Trail</a>
+    </nav>
+
+    <section class="grid cards">
+      <article class="telemetry-card"><span>Blocks Found</span><strong id="blocks-found">0</strong><small>Candidate captures</small></article>
+      <article class="telemetry-card"><span>Valid / Invalid Shares</span><strong><span id="valid-shares">0</span> / <span id="invalid-shares">0</span></strong><small>Signal integrity</small></article>
+      <article class="telemetry-card"><span>Unpaid / Paid</span><strong><span id="pool-unpaid">0 EVR</span></strong><small id="pool-paid">0 EVR paid</small></article>
+      <article class="telemetry-card"><span>Pool Hashrate</span><strong id="pool-hashrate">0 H/s</strong><small>Array throughput</small></article>
+      <article class="telemetry-card"><span>Active Miners</span><strong id="active-miners">0</strong><small>Connected crews</small></article>
+    </section>
+
+    <section class="mission-grid">
+      <section class="panel mission-panel">
+        <div class="panel-header"><div><p class="panel-kicker">// Block Radar</p><h2>Recent block candidates</h2><p class="muted">Submitted candidates, reward accounting, and maturity status.</p></div></div>
+        <div id="blocks" class="list"></div>
+      </section>
+      <section class="panel mission-panel">
+        <div class="panel-header"><div><p class="panel-kicker">// Payout Ledger</p><h2>Recent payouts</h2><p class="muted">Wallet transactions sent by the payout worker.</p></div></div>
+        <div id="payouts" class="list"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

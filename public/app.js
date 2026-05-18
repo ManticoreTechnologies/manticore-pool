@@ -53,7 +53,12 @@ function currentAddressFilter() {
   if (parts[0] === 'dashboard' && parts[1]) {
     return parts[1];
   }
-  return byId('address-filter').value.trim();
+  var filter = byId('address-filter');
+  if (filter) {
+    return filter.value.trim();
+  }
+  var minerAddress = byId('miner-address');
+  return minerAddress ? minerAddress.value.trim() : '';
 }
 
 function connectHostDefault() {
@@ -125,6 +130,9 @@ function renderConfig(config) {
 
 function renderWorkers(workers) {
   var tbody = byId('workers');
+  if (!tbody) {
+    return;
+  }
   tbody.innerHTML = '';
 
   if (!workers.length) {
@@ -151,6 +159,9 @@ function renderWorkers(workers) {
 
 function renderBlocks(blocks) {
   var container = byId('blocks');
+  if (!container) {
+    return;
+  }
   container.innerHTML = '';
   if (!blocks.length) {
     container.innerHTML = '<p class="empty">No block candidates submitted yet.</p>';
@@ -170,6 +181,9 @@ function renderBlocks(blocks) {
 
 function renderPayouts(payouts) {
   var container = byId('payouts');
+  if (!container) {
+    return;
+  }
   container.innerHTML = '';
   if (!payouts.length) {
     container.innerHTML = '<p class="empty">No payouts sent yet.</p>';
@@ -197,9 +211,15 @@ function renderMiner(summary) {
   setText('miner-unpaid', formatEvr(totals.unpaid));
   setText('miner-eligible', formatEvr(candidates.total));
   setText('selected-address-readout', shortAddress(address));
-  byId('auto-payout').checked = prefs.autoPayout === true;
-  byId('payout-threshold').value = satsToEvrNumber(prefs.payoutThreshold).toFixed(8);
-  byId('miner-link').href = address ? '/dashboard/' + encodeURIComponent(address) : '#';
+  if (byId('auto-payout')) {
+    byId('auto-payout').checked = prefs.autoPayout === true;
+  }
+  if (byId('payout-threshold')) {
+    byId('payout-threshold').value = satsToEvrNumber(prefs.payoutThreshold).toFixed(8);
+  }
+  if (byId('miner-link')) {
+    byId('miner-link').href = address ? '/dashboard/' + encodeURIComponent(address) : '/miner';
+  }
 }
 
 async function refresh() {
@@ -235,9 +255,9 @@ async function refresh() {
     renderPayouts(results[5]);
     if (address) {
       renderMiner(results[6]);
-      byId('miner-panel').style.display = '';
+      if (byId('miner-panel')) byId('miner-panel').style.display = '';
     } else {
-      byId('miner-panel').style.display = '';
+      if (byId('miner-panel')) byId('miner-panel').style.display = '';
       renderMiner({ address: '', totals: {}, preferences: { payoutThreshold: results[0].payoutThreshold || 0 }, payoutCandidates: { total: 0 } });
     }
   } catch (error) {
@@ -247,22 +267,35 @@ async function refresh() {
   }
 }
 
-byId('refresh').addEventListener('click', refresh);
-byId('address-filter').addEventListener('input', function() {
-  byId('miner-address').value = byId('address-filter').value.trim();
-  refresh();
-});
-byId('miner-address').addEventListener('change', function() {
-  var address = byId('miner-address').value.trim();
-  byId('address-filter').value = address;
-  if (address) {
-    window.history.replaceState({}, '', '/dashboard/' + encodeURIComponent(address));
-  } else {
-    window.history.replaceState({}, '', '/');
-  }
-  refresh();
-});
-byId('save-payout-settings').addEventListener('click', async function() {
+if (byId('refresh')) {
+  byId('refresh').addEventListener('click', refresh);
+}
+if (byId('address-filter')) {
+  byId('address-filter').addEventListener('input', function() {
+    if (byId('miner-address')) {
+      byId('miner-address').value = byId('address-filter').value.trim();
+    }
+    refresh();
+  });
+}
+if (byId('miner-address')) {
+  byId('miner-address').addEventListener('change', function() {
+    var address = byId('miner-address').value.trim();
+    if (byId('address-filter')) {
+      byId('address-filter').value = address;
+    }
+    if (address) {
+      window.history.replaceState({}, '', '/dashboard/' + encodeURIComponent(address));
+    } else if (document.body.dataset.page === 'miner') {
+      window.history.replaceState({}, '', '/miner');
+    } else {
+      window.history.replaceState({}, '', '/');
+    }
+    refresh();
+  });
+}
+if (byId('save-payout-settings')) {
+  byId('save-payout-settings').addEventListener('click', async function() {
   var address = currentAddressFilter() || byId('miner-address').value.trim();
   if (!address) {
     byId('payout-message').textContent = 'Enter a payout address first.';
@@ -278,8 +311,10 @@ byId('save-payout-settings').addEventListener('click', async function() {
   } catch (error) {
     byId('payout-message').textContent = 'Could not save settings: ' + error.message;
   }
-});
-byId('manual-payout').addEventListener('click', async function() {
+  });
+}
+if (byId('manual-payout')) {
+  byId('manual-payout').addEventListener('click', async function() {
   var address = currentAddressFilter() || byId('miner-address').value.trim();
   if (!address) {
     byId('payout-message').textContent = 'Enter a payout address first.';
@@ -295,7 +330,8 @@ byId('manual-payout').addEventListener('click', async function() {
   } catch (error) {
     byId('payout-message').textContent = 'Manual payout not sent: ' + error.message;
   }
-});
+  });
+}
 
 function openMenu() {
   document.body.classList.add('nav-open');
@@ -342,19 +378,25 @@ async function copyFromElement(id) {
   textarea.remove();
 }
 
-byId('menu-button').addEventListener('click', function() {
-  if (document.body.classList.contains('nav-open')) {
-    closeMenu();
-  } else {
-    openMenu();
-  }
-});
-byId('nav-close').addEventListener('click', closeMenu);
-byId('nav-overlay').addEventListener('click', function(event) {
-  if (event.target === byId('nav-overlay')) {
-    closeMenu();
-  }
-});
+if (byId('menu-button')) {
+  byId('menu-button').addEventListener('click', function() {
+    if (document.body.classList.contains('nav-open')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+}
+if (byId('nav-close')) {
+  byId('nav-close').addEventListener('click', closeMenu);
+}
+if (byId('nav-overlay')) {
+  byId('nav-overlay').addEventListener('click', function(event) {
+    if (event.target === byId('nav-overlay')) {
+      closeMenu();
+    }
+  });
+}
 Array.prototype.forEach.call(document.querySelectorAll('.nav-item'), function(link) {
   link.addEventListener('click', closeMenu);
 });
@@ -365,6 +407,9 @@ document.addEventListener('keydown', function(event) {
 });
 
 ['connect-host', 'connect-port', 'connect-address', 'connect-worker', 'connect-password', 'connect-profile'].forEach(function(id) {
+  if (!byId(id)) {
+    return;
+  }
   byId(id).addEventListener('input', updateConnectPreview);
   byId(id).addEventListener('change', updateConnectPreview);
 });
@@ -384,11 +429,13 @@ Array.prototype.forEach.call(document.querySelectorAll('.copy-button'), function
 
 var initialFilter = currentAddressFilter();
 if (initialFilter) {
-  byId('address-filter').value = initialFilter;
-  byId('miner-address').value = initialFilter;
-  byId('connect-address').value = initialFilter;
+  if (byId('address-filter')) byId('address-filter').value = initialFilter;
+  if (byId('miner-address')) byId('miner-address').value = initialFilter;
+  if (byId('connect-address')) byId('connect-address').value = initialFilter;
 }
-byId('connect-host').value = connectHostDefault();
+if (byId('connect-host')) {
+  byId('connect-host').value = connectHostDefault();
+}
 
 function updateMissionClock() {
   var now = new Date();
@@ -396,7 +443,9 @@ function updateMissionClock() {
 }
 
 updateMissionClock();
-updateConnectPreview();
+if (byId('connect-host')) {
+  updateConnectPreview();
+}
 setInterval(updateMissionClock, 1000);
 refresh();
 setInterval(refresh, 15000);
